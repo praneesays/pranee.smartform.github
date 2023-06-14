@@ -1,0 +1,290 @@
+@import "variables";
+
+:host {
+  display: block;
+  height: 100%;
+  // padding: 1rem 2rem;
+}
+
+.mat-stepper-horizontal {
+  // background-color: #f9fafb;
+  background-color: #f4f3f6;
+  @extend .default-fontSize !optional;
+
+  ::ng-deep {
+    .mat-step-header {
+      &.cdk-keyboard-focused,
+      &.cdk-program-focused,
+      &:hover:not([aria-disabled]),
+      &:hover[aria-disabled="false"] {
+        background: transparent;
+      }
+    }
+
+    .mat-horizontal-stepper-wrapper {
+      height: 100%;
+    }
+    .mat-horizontal-content-container {
+      padding: 0;
+      // padding-right: 24px;
+      height: 100%;
+      // background-color: #ffffff;
+    }
+
+    .mat-horizontal-stepper-content:not(
+        .mat-horizontal-stepper-content-inactive
+      ) {
+      height: 100%;
+    }
+
+    .mat-horizontal-stepper-header {
+      padding: 0;
+      padding-right: 24px;
+      height: auto;
+    }
+
+    .mat-horizontal-stepper-header-container {
+      margin-bottom: 1rem;
+      padding: 0rem 5rem;
+    }
+  }
+}
+
+.default-control-width {
+  width: 100%;
+  // max-width: 400px;
+}
+
+.empty-selection {
+  color: #6c757d;
+  margin: 3rem;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.privacy-text {
+  width: 40%;
+}
+
+@media screen and (min-width: 800px) {
+  form mat-form-field + mat-form-field {
+    margin-left: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mat-stepper-horizontal {
+    ::ng-deep {
+      .mat-step-label {
+        display: none;
+      }
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .empty-selection {
+    margin: 0;
+    margin-top: 1rem;
+    h2 {
+      padding: 1rem;
+    }
+  }
+
+  .privacy-text {
+    width: 75%;
+  }
+
+  .mat-stepper-horizontal {
+    ::ng-deep {
+      .mat-horizontal-stepper-header-container {
+        padding: 0rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .privacy-text {
+    width: 100%;
+  }
+}
+
+.card-list-horizontal-6 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+
+  > mat-card {
+    margin: 10px;
+  }
+
+  flex-direction: row;
+
+  @media screen and (max-width: 1000px) {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.accordion-headers-align {
+  .mat-expansion-panel-header-description {
+    justify-content: space-between;
+    flex-grow: 0;
+  }
+
+  .mat-mdc-form-field + .mat-mdc-form-field {
+    margin-left: 8px;
+  }
+}
+
+mat-expansion-panel-header.invalid {
+  .mat-expansion-panel-header-title,
+  .mat-expansion-panel-header-description {
+    color: red;
+  }
+}
+
+.min-height-300 {
+  min-height: 300px;
+}
+
+.checkbox-container {
+  mat-button-toggle-group {
+    mat-button-toggle {
+      width: 100%;
+      max-width: 300px;
+      height: 175px;
+
+      ::ng-deep {
+        .mat-button-toggle-button {
+          height: 100%;
+        }
+        .mat-button-toggle-appearance-standard
+          .mat-button-toggle-label-content {
+          padding: 0;
+        }
+      }
+      // &:last-child {
+      //   pointer-events: none;
+      //   opacity: .6;
+      //   background: rgb(0 0 0 / 8%);
+      // }
+    }
+  }
+  .mat-button-toggle-checked {
+    background-color: $primary-color;
+    color: #fff;
+  }
+}
+
+@media (max-width: 576px) {
+  .checkbox-container {
+    mat-button-toggle-group {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+}
+
+.vertical-tabs-section {
+  .vertical-tabs {
+    // width: 20%;
+    ::ng-deep {
+      button {
+        color: gray;
+        font-weight: 500;
+        // width: 95%;
+        text-align: left;
+        font-size: 16px;
+      }
+    }
+    &.nav-pills .nav-link {
+      // background-color: #f4f3f6;
+
+      &.active {
+        border: 3px solid $primary-color;
+        color: $primary-color;
+        background-color: #fff;
+        // background-color: #eef6ff;
+        // border: 1px solid $primary-color;
+        // color: #fff;
+        // background-color: $primary-color;
+      }
+    }
+  }
+
+  .tab-content {
+    // width: 80%;
+    padding: .5rem 1rem;
+  }
+
+  [type=radio] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  [type=radio] + img {
+    width: 200px;
+    height: 150px;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    cursor: pointer;
+  }
+
+  [type=radio]:checked + img {
+    outline: 3px solid $primary-color;
+    box-shadow: $primary-color 0px 3px 8px;
+  }
+
+  // .product-image {
+  //   width: 200px;
+  //   height: 150px;
+  //   border-radius: 0.5rem;
+  //   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  //   cursor: pointer;
+  // }
+}
+
+.mat-step-header .mat-step-icon-selected {
+  background-color: $primary-color;
+}
+
+.mat-mdc-standard-chip.mat-primary.mat-mdc-chip-selected {
+  background-color: $primary-color;
+}
+
+.chip-options-sections {
+  [type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  [type="radio"] + img {
+    width: 200px;
+    height: 150px;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    cursor: pointer;
+  }
+
+  [type="radio"]:checked + img {
+    outline: 3px solid $primary-color;
+    box-shadow: $primary-color 0px 3px 8px;
+  }
+
+   // .product-image {
+  //   width: 200px;
+  //   height: 150px;
+  //   border-radius: 0.5rem;
+  //   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  //   cursor: pointer;
+  // }
+}

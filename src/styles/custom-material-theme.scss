@@ -1,0 +1,114 @@
+// @use "@angular/material" as mat;
+
+// @include mat.core();
+
+@import '@angular/material/theming';
+
+@include mat-core();
+
+$default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+  "Segoe UI Symbol";
+
+  $mat-typography-config: mat-typography-config(
+    $font-family: $default-font-family
+  );
+
+  @include angular-material-typography($mat-typography-config);
+
+// $primary-palette: (
+//   50: #efe5fd,
+//   100: #d4bff9,
+//   200: #b794f6,
+//   300: #9965f4,
+//   400: #7e3ff2,
+//   500: #6002ee,
+//   600: #5300e8,
+//   700: #3d00e0,
+//   800: #1c00db,
+//   900: #0000d6,
+//   contrast:
+//     (
+//       50: 'rgba(0, 0, 0, 0.87)',
+//       100: 'rgba(0, 0, 0, 0.87)',
+//       200: 'rgba(0, 0, 0, 0.87)',
+//       300: 'rgba(255, 255, 255, 0.87)',
+//       400: 'rgba(255, 255, 255, 0.87)',
+//       500: 'rgba(255, 255, 255, 0.87)',
+//       600: 'rgba(255, 255, 255, 0.87)',
+//       700: 'rgba(255, 255, 255, 0.87)',
+//       800: 'rgba(255, 255, 255, 0.87)',
+//       900: 'rgba(255, 255, 255, 0.87)'
+//     ),
+// );
+
+// $secondary-palette: (
+//   50: #FFFFFF,
+//   100: #FAFAFA,
+//   200: #F5F5F5,
+//   300: #F0F0F0,
+//   400: #DEDEDE,
+//   500: #C2C2C2,
+//   600: #979797,
+//   700: #818181,
+//   800: #606060,
+//   900: #3C3C3C,
+//   contrast:
+//     (
+//       50: 'rgba(0, 0, 0, 0.87)',
+//       100: 'rgba(0, 0, 0, 0.87)',
+//       200: 'rgba(0, 0, 0, 0.87)',
+//       300: 'rgba(255, 255, 255, 0.87)',
+//       400: 'rgba(255, 255, 255, 0.87)',
+//       500: 'rgba(255, 255, 255, 0.87)',
+//       600: 'rgba(255, 255, 255, 0.87)',
+//       700: 'rgba(255, 255, 255, 0.87)',
+//       800: 'rgba(255, 255, 255, 0.87)',
+//       900: 'rgba(255, 255, 255, 0.87)'
+//     ),
+// );
+
+// $my-primary: mat.define-palette($primary-palette, 600);
+// $my-accent: mat.define-palette($secondary-palette, 200);
+
+// $my-theme: mat.define-dark-theme(
+//   (
+//     color: (
+//       primary: $my-primary,
+//       accent: $my-accent,
+//     ),
+//     typography: mat.define-typography-config(),
+//     density: 0,
+//   )
+// );
+
+// // $my-theme: map.merge($my-theme, map.merge((
+// //   typography: (
+// //     font-family: $default-font-family,
+// //   ),
+// // ), mat.define-typography-config()));
+// // $mat-typography-config: mat.define-typography-config(
+// //   $font-family: $mat-font-family
+// // );
+
+// // @include angular-material-typography($mat-typography-config);
+// // @include mat.core-theme($my-theme);
+// // Override Angular Material typography styles
+// // $my-theme: map.merge($my-theme, (
+// //   typography: (
+// //     font-family: $default-font-family,
+// //   )
+// // ));
+
+// @include mat.all-component-themes($my-theme);
+
+// // $custom-theme: mat-light-theme(
+// //   (
+// //     color: (
+// //       primary: $primary-color,
+// //       accent: $accent-color
+// //     )
+// //   )
+// // );
+
+// // @include angular-material-theme($custom-theme);

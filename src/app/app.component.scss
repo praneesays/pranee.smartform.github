@@ -1,0 +1,56 @@
+.wizard-container {
+  .main-container {
+    // width: calc(100% - 266px);
+    width: 100%;
+  }
+  @media screen and (min-width: 800px) {
+    // width: calc(100% - 325px);
+  }
+
+  .wizard-label {
+    &.invalid {
+      color: red;
+    }
+  }
+
+  .side-container {
+    width: 250px;
+  }
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+main {
+  flex: 1;
+  // background-color: #ffffff;
+  border-radius: 1rem;
+  margin: 2rem auto;
+  margin-top: 65px;
+
+  .wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+app-footer {
+  margin-top: auto;
+}
+
+ /* CSS rules for mobile screens */
+ @media (max-width: 767px) {
+  .wizard-container {
+    .main-container {
+      width: 100%;
+    }
+    .side-container {
+      display: none;
+    }
+  }
+ }

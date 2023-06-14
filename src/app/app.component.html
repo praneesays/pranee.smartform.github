@@ -1,0 +1,44 @@
+<app-header class="centered-container"></app-header>
+<main class="centered-container">
+  <div
+    class="wizard-container d-flex position-relative h-100"
+    *ngIf="authorized$ | async; else notAuthorizedTemplate"
+  >
+    <div class="main-container p-4">
+      <router-outlet></router-outlet>
+    </div>
+
+    <!-- <div
+      class="side-container bg-white h-100 ">
+      <div *ngIf="isFormPage"
+        class="progress-wrapper d-flex flex-column h-100"
+        style="box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.1)"
+      >
+        <div class="progress-container">
+          <circle-progress
+            [percent]="progress"
+            [responsive]="true"
+            [radius]="100"
+            [outerStrokeWidth]="16"
+            [innerStrokeWidth]="8"
+            [outerStrokeColor]="'#3a7bf9'"
+            [innerStrokeColor]="'#3a7bf9bf'"
+            [animation]="true"
+            [animationDuration]="300"
+            [titleFontSize]="'24'"
+            [unitsFontSize]="'20'"
+            [subtitle]="'Progress'"
+            [subtitleFontSize]="'18'"
+          ></circle-progress>
+        </div>
+
+        <div class="step d-flex position-relative align-items-center justify-content-between w-100 p-4">
+          <div>Step</div>
+          <div>{{ currentStep }}/{{ totalSteps }}</div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+  <ng-template #notAuthorizedTemplate> Not authorized </ng-template>
+</main>
+<app-footer class="centered-container"></app-footer>
