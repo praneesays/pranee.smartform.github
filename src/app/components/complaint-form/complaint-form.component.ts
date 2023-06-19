@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -122,7 +122,7 @@ const products: Product[] = [
   {
     name: 'One-Press Device',
     type: ProductTypes.OnePressDevice,
-    imagePath: './assets/products/onepressdevice.PNG',
+    imagePath: './assets/products/onepressdevice.png',
     brands: [
       { name: 'tremfya', imagePath: './assets/brands/onePressDevice-1.PNG' },
     ],
@@ -130,7 +130,7 @@ const products: Product[] = [
   {
     name: 'Prefilled Syringe',
     type: ProductTypes.PrefilledSyringe,
-    imagePath: './assets/products/prefilledsyringe.PNG',
+    imagePath: './assets/products/prefilledsyringe.png',
     brands: [
       {
         name: 'stelara',
@@ -149,7 +149,7 @@ const products: Product[] = [
   {
     name: 'Autoinjector',
     type: ProductTypes.Autoinjector,
-    imagePath: './assets/products/autoinjector.PNG',
+    imagePath: './assets/products/autoinjector.png',
     brands: [
       { name: 'simponi', imagePath: './assets/brands/autoinjector-1.PNG' },
     ],
@@ -157,13 +157,13 @@ const products: Product[] = [
   {
     name: 'Spray',
     type: ProductTypes.Spray,
-    imagePath: './assets/products/spray.PNG',
+    imagePath: './assets/products/spray.png',
     brands: [{ name: 'spravato', imagePath: './assets/brands/spray-1.PNG' }],
   },
   {
     name: 'Tablet',
     type: ProductTypes.Tablet,
-    imagePath: './assets/products/tablet.PNG',
+    imagePath: './assets/products/tablet.png',
     brands: [
       { name: 'tablet1', imagePath: './assets/brands/tablet-1.PNG' },
       { name: 'tablet2', imagePath: './assets/brands/tablet-2.PNG' },
@@ -178,7 +178,7 @@ const products: Product[] = [
   {
     name: 'Vial',
     type: ProductTypes.Vial,
-    imagePath: './assets/products/vial.PNG',
+    imagePath: './assets/products/vial.png',
     brands: [
       { name: 'vial1', imagePath: './assets/brands/vial-1.PNG' },
       { name: 'vial2', imagePath: './assets/brands/vial-2.PNG' },
@@ -194,7 +194,7 @@ const products: Product[] = [
   {
     name: 'Injection Kit',
     type: ProductTypes.InjectionKit,
-    imagePath: './assets/products/injectionkit.PNG',
+    imagePath: './assets/products/injectionkit.png',
     brands: [
       { name: 'risperdal', imagePath: './assets/brands/injectionKit-1.PNG' },
     ],
@@ -202,7 +202,7 @@ const products: Product[] = [
   {
     name: 'Cream',
     type: ProductTypes.Cream,
-    imagePath: './assets/products/cream.PNG',
+    imagePath: './assets/products/cream.png',
     brands: [
       { name: 'cream1', imagePath: './assets/brands/cream-1.PNG' },
       { name: 'cream2', imagePath: './assets/brands/cream-2.PNG' },
@@ -212,19 +212,19 @@ const products: Product[] = [
   {
     name: 'Patch',
     type: ProductTypes.Patch,
-    imagePath: './assets/products/patch.PNG',
+    imagePath: './assets/products/patch.png',
     brands: [{ name: 'evra', imagePath: './assets/brands/patch-1.PNG' }],
   },
   {
     name: 'Ampule',
     type: ProductTypes.Ampule,
-    imagePath: './assets/products/ampule.PNG',
+    imagePath: './assets/products/ampule.png',
     brands: [{ name: 'daktarin', imagePath: './assets/brands/ampule-1.PNG' }],
   },
   {
     name: 'Other',
     type: ProductTypes.Other,
-    imagePath: './assets/products/others.png',
+    imagePath: './assets/products/other.png',
     brands: [
       { name: 'other1', imagePath: './assets/brands/other-1.PNG' },
       { name: 'other2', imagePath: './assets/brands/other-2.PNG' },
@@ -238,7 +238,7 @@ const products: Product[] = [
   templateUrl: './complaint-form.component.html',
   styleUrls: ['./complaint-form.component.scss'],
 })
-export class ComplaintFormComponent implements OnDestroy, OnInit {
+export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit {
   readonly UserTypes = UserTypes;
   readonly ComplaintReportTypes = ComplaintReportTypes;
   readonly ProductTypes = ProductTypes;
@@ -440,6 +440,12 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
 
   showConcomitantProductDetails = false;
 
+  @ViewChild('brandsSection') brandsSection!: ElementRef;
+  @ViewChild('strengthSection') strengthSection?: ElementRef;
+
+  showAllProducts: boolean = true; 
+  selectedProductIndex: number = -1; 
+
   constructor(
     private readonly bottomSheet: MatBottomSheet,
     private readonly questionsService: QuestionsService,
@@ -537,6 +543,10 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
         nonNullable: true,
         validators: [Validators.required],
       }),
+      returnOption: fb.control<ReturnOption | null>(null, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
       hasBatchLotNumber: fb.control<boolean | null>(null, {
         nonNullable: true,
         validators: [Validators.required],
@@ -556,10 +566,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
       serial: fb.control<string>('', {
         nonNullable: true,
         validators: [],
-      }),
-      returnOption: fb.control<ReturnOption | null>(null, {
-        nonNullable: true,
-        validators: [Validators.required],
       }),
       hcp: fb.group<FormGroupType<IHcpData>>({
         reportedFromJNJProgram: fb.control<boolean | null>(null, {
@@ -655,6 +661,45 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
           isProductAvailable: fb.control<boolean | null>(null, {
             nonNullable: true,
             validators: [Validators.required],
+          }),
+          additionalContactInformation: fb.group<FormGroupType<IContactInformation>>({
+            addressLine1: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            addressLine2: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            city: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            country: fb.control<Country | null>(null, {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            postalCode: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            state: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            telephone: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            emailAddress: fb.control<string>('', {
+              nonNullable: true,
+              validators: [
+                Validators.required,
+                Validators.pattern(
+                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
+                ),
+              ],
+            }),
           }),
           dateOfBirth: fb.control<DateTime>(
             DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
@@ -838,6 +883,45 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
           isProductAvailable: fb.control<boolean | null>(null, {
             nonNullable: true,
             validators: [Validators.required],
+          }),
+          additionalContactInformation: fb.group<FormGroupType<IContactInformation>>({
+            addressLine1: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            addressLine2: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            city: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            country: fb.control<Country | null>(null, {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            postalCode: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            state: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            telephone: fb.control<string>('', {
+              nonNullable: true,
+              validators: [Validators.required],
+            }),
+            emailAddress: fb.control<string>('', {
+              nonNullable: true,
+              validators: [
+                Validators.required,
+                Validators.pattern(
+                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
+                ),
+              ],
+            }),
           }),
           dateOfBirth: fb.control<DateTime>(
             DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
@@ -1341,9 +1425,64 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
 
   ngOnInit() {}
 
+  ngAfterViewInit(): void {
+    this.complaintReportingFormGroup.controls.product.valueChanges.subscribe((product) => {
+      if (product) {
+        this.scrollToItemSection();
+      }
+    });
+
+    this.complaintReportingFormGroup.controls.brand.valueChanges.subscribe((brand) => {
+      if (brand) {
+        this.scrollToStrengthSection();
+      }
+    });
+  }
+
+  private scrollToItemSection(): void {
+    // this.brandsSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  private scrollToStrengthSection(): void {
+    
+    setTimeout(() => {
+      if (!this.strengthSection) {
+        return
+      }
+      this.strengthSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+    
+  }
+
   // get concomitantProductDetails(): FormArray {
   //   return this.complaintDetailsFormGroup.get('product.concomitantMedication.details') as FormArray;
   // }
+
+  onPatientRadioChange(value: boolean) {
+    const patientContactInfo = this.userDetailsFormGroup.get('patientInformation.patient.contactInformation');
+    const contactFields = ['addressLine1', 'addressLine2', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
+
+    contactFields.forEach(contact => {
+      const control = patientContactInfo?.get(contact);
+      if (control) {
+        control.setValidators(value ? [Validators.required] : []);
+        control.updateValueAndValidity();
+      }
+    })
+  }
+
+  onNonPatientReporterRadioChange(value: boolean) {
+    const patientReporterContactInfo = this.userDetailsFormGroup.get('patientReporterInformation.patient.contactInformation');
+    const contactFields = ['addressLine1', 'addressLine2', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
+
+    contactFields.forEach(contact => {
+      const control = patientReporterContactInfo?.get(contact);
+      if (control) {
+        control.setValidators(value ? [Validators.required] : []);
+        control.updateValueAndValidity();
+      }
+    })
+  }
 
   get formControls(): { label: string; value: string }[] {
     const controls = this.complaintReportingFormGroup.controls;
@@ -1352,8 +1491,11 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
         key
       ) as AbstractControl;
       let value: string;
+
       if (Array.isArray(control.value)) {
         value = control.value.join(', ');
+      } else if (typeof control.value === 'object' && control.value !== null) {
+        value = this.formatObjectValue(control.value);
       } else if (control.value !== null) {
         value = control.value.toString();
       } else {
@@ -1368,6 +1510,11 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
       label: string;
       value: string;
     }[];
+  }
+
+  private formatObjectValue(obj: any): string {
+    const properties = Object.keys(obj).map(prop => `${prop}: ${obj[prop]}`);
+    return properties.join(', ');
   }
 
   addConcomitantProductDetails() {
@@ -1440,12 +1587,19 @@ export class ComplaintFormComponent implements OnDestroy, OnInit {
     return this.complaintReportingFormGroup.get('brand') as FormControl;
   }
 
-  onProductSelectionChange(productType: string): void {
+  onProductSelectionChange(index: number): void {
     this.selectedBrandControl.setValue(null);
+    this.selectedProductIndex = index;
+    this.showAllProducts = false;
+  }
+
+  toggleProducts() {
+    this.showAllProducts = !this.showAllProducts;
   }
 
   onBrandSelectionChange(brandName: string): void {
     this.selectedBrandControl.setValue(brandName);
+    // this.scrollToStrengthSection();
   }
 
   private _filterGroup(value: string): StateGroup[] {

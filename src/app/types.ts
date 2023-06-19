@@ -25,14 +25,14 @@ export interface IComplaintReporting {
   brand: string;
   strength: string;
 
+  returnOption: ReturnOption | null;
+
   hasBatchLotNumber: boolean | null;
   batchLotNumber?: string;
   noReason?: string;
 
   gtin?: string;
   serial?: string;
-
-  returnOption: ReturnOption | null;
 
   hcp: IHcpData;
 
@@ -109,6 +109,7 @@ export interface IPatientDetails {
   lastName: string;
   contactInformation: IContactInformation;
   isProductAvailable: boolean | null;
+  additionalContactInformation: IContactInformation;
   dateOfBirth: DateTime;
   ageAtComplaint?: string | null;
 }
