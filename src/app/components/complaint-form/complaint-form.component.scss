@@ -243,8 +243,7 @@ mat-expansion-panel-header.invalid {
   }
 
   [type="radio"] + .product-section {
-    border-radius: 0.5rem;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
     cursor: pointer;
     transition: transform 0.5s;
     &:hover {
@@ -252,10 +251,16 @@ mat-expansion-panel-header.invalid {
     }
 
     .image-section {
-      background: #cccccc8c;
+      // background: #cccccc8c;
       /* border-radius: 0.5rem; */
       border-top-left-radius: 0.5rem;
       border-top-right-radius: 0.5rem;
+    }
+
+    .image-caption {
+      background: #cccccc8c;
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
     }
   }
 
@@ -264,6 +269,13 @@ mat-expansion-panel-header.invalid {
     box-shadow: $primary-color 0px 3px 8px;
     &:hover {
       transform: scale(1);
+    }
+
+    .image-caption {
+      background: #0a58ca;
+      color: #fff;
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
     }
   }
 

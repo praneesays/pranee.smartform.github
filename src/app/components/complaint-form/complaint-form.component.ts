@@ -165,14 +165,14 @@ const products: Product[] = [
     type: ProductTypes.Tablet,
     imagePath: './assets/products/tablet.png',
     brands: [
-      { name: 'tablet1', imagePath: './assets/brands/tablet-1.PNG' },
-      { name: 'tablet2', imagePath: './assets/brands/tablet-2.PNG' },
-      { name: 'tablet3', imagePath: './assets/brands/tablet-3.PNG' },
-      { name: 'tablet4', imagePath: './assets/brands/tablet-4.PNG' },
-      { name: 'tablet5', imagePath: './assets/brands/tablet-5.PNG' },
-      { name: 'tablet6', imagePath: './assets/brands/tablet-6.PNG' },
-      { name: 'tablet7', imagePath: './assets/brands/tablet-7.PNG' },
-      { name: 'tablet8', imagePath: './assets/brands/tablet-8.PNG' },
+      { name: 'symtuza', imagePath: './assets/brands/tablet-1.PNG' },
+      { name: 'erleada', imagePath: './assets/brands/tablet-2.PNG' },
+      { name: 'opsynvi', imagePath: './assets/brands/tablet-3.PNG' },
+      { name: 'xarelto', imagePath: './assets/brands/tablet-4.PNG' },
+      { name: 'balversa', imagePath: './assets/brands/tablet-5.PNG' },
+      { name: 'risperdal', imagePath: './assets/brands/tablet-6.PNG' },
+      { name: 'imbruvica', imagePath: './assets/brands/tablet-7.PNG' },
+      { name: 'uptravi', imagePath: './assets/brands/tablet-8.PNG' },
     ],
   },
   {
@@ -180,15 +180,15 @@ const products: Product[] = [
     type: ProductTypes.Vial,
     imagePath: './assets/products/vial.png',
     brands: [
-      { name: 'vial1', imagePath: './assets/brands/vial-1.PNG' },
-      { name: 'vial2', imagePath: './assets/brands/vial-2.PNG' },
-      { name: 'vial3', imagePath: './assets/brands/vial-3.PNG' },
-      { name: 'vial4', imagePath: './assets/brands/vial-4.PNG' },
-      { name: 'vial5', imagePath: './assets/brands/vial-5.PNG' },
-      { name: 'vial6', imagePath: './assets/brands/vial-6.PNG' },
-      { name: 'vial7', imagePath: './assets/brands/vial-7.PNG' },
-      { name: 'vial8', imagePath: './assets/brands/vial-8.PNG' },
-      { name: 'vial9', imagePath: './assets/brands/vial-9.PNG' },
+      { name: 'velcade', imagePath: './assets/brands/vial-1.PNG' },
+      { name: 'remicade', imagePath: './assets/brands/vial-2.PNG' },
+      { name: 'darzalex', imagePath: './assets/brands/vial-3.PNG' },
+      { name: 'simponi', imagePath: './assets/brands/vial-4.PNG' },
+      { name: 'uptravi', imagePath: './assets/brands/vial-5.PNG' },
+      { name: 'ponvory', imagePath: './assets/brands/vial-6.PNG' },
+      { name: 'sterala', imagePath: './assets/brands/vial-7.PNG' },
+      { name: 'tecvayli', imagePath: './assets/brands/vial-8.PNG' },
+      { name: 'rybrevant', imagePath: './assets/brands/vial-9.PNG' },
     ],
   },
   {
@@ -204,9 +204,9 @@ const products: Product[] = [
     type: ProductTypes.Cream,
     imagePath: './assets/products/cream.png',
     brands: [
-      { name: 'cream1', imagePath: './assets/brands/cream-1.PNG' },
-      { name: 'cream2', imagePath: './assets/brands/cream-2.PNG' },
-      { name: 'cream3', imagePath: './assets/brands/cream-3.PNG' },
+      { name: 'daktarin', imagePath: './assets/brands/cream-1.PNG' },
+      { name: 'nizoral', imagePath: './assets/brands/cream-2.PNG' },
+      { name: 'daktacort', imagePath: './assets/brands/cream-3.PNG' },
     ],
   },
   {
@@ -226,9 +226,42 @@ const products: Product[] = [
     type: ProductTypes.Other,
     imagePath: './assets/products/other.png',
     brands: [
-      { name: 'other1', imagePath: './assets/brands/other-1.PNG' },
-      { name: 'other2', imagePath: './assets/brands/other-2.PNG' },
-      { name: 'other3', imagePath: './assets/brands/other-3.PNG' },
+      { name: 'carvykti', imagePath: './assets/brands/other-1.PNG' },
+      { name: 'cabenuva', imagePath: './assets/brands/other-2.PNG' },
+      { name: 'akeega', imagePath: './assets/brands/other-3.PNG' },
+    ],
+  },
+  {
+    name: 'Unknown',
+    type: ProductTypes.Unknown,
+    imagePath: './assets/products/unknown.png',
+    brands: [
+      { name: 'tremfya', imagePath: './assets/brands/onePressDevice-1.PNG' },
+      { name: 'stelara', imagePath: './assets/brands/prefilledSyringe-1.PNG' },
+      { name: 'hafyera', imagePath: './assets/brands/prefilledSyringe-3.PNG' },
+      { name: 'simponi', imagePath: './assets/brands/autoinjector-1.PNG' },
+      { name: 'spravato', imagePath: './assets/brands/spray-1.PNG' },
+      { name: 'symtuza', imagePath: './assets/brands/tablet-1.PNG' },
+      { name: 'erleada', imagePath: './assets/brands/tablet-2.PNG' },
+      { name: 'opsynvi', imagePath: './assets/brands/tablet-3.PNG' },
+      { name: 'xarelto', imagePath: './assets/brands/tablet-4.PNG' },
+      { name: 'balversa', imagePath: './assets/brands/tablet-5.PNG' },
+      { name: 'risperdal', imagePath: './assets/brands/tablet-6.PNG' },
+      { name: 'imbruvica', imagePath: './assets/brands/tablet-7.PNG' },
+      { name: 'uptravi', imagePath: './assets/brands/tablet-8.PNG' },
+      { name: 'velcade', imagePath: './assets/brands/vial-1.PNG' },
+      { name: 'remicade', imagePath: './assets/brands/vial-2.PNG' },
+      { name: 'darzalex', imagePath: './assets/brands/vial-3.PNG' },
+      { name: 'ponvory', imagePath: './assets/brands/vial-6.PNG' },
+      { name: 'tecvayli', imagePath: './assets/brands/vial-8.PNG' },
+      { name: 'rybrevant', imagePath: './assets/brands/vial-9.PNG' },
+      { name: 'daktarin', imagePath: './assets/brands/cream-1.PNG' },
+      { name: 'nizoral', imagePath: './assets/brands/cream-2.PNG' },
+      { name: 'daktacort', imagePath: './assets/brands/cream-3.PNG' },
+      { name: 'evra', imagePath: './assets/brands/patch-1.PNG' },
+      { name: 'carvykti', imagePath: './assets/brands/other-1.PNG' },
+      { name: 'cabenuva', imagePath: './assets/brands/other-2.PNG' },
+      { name: 'akeega', imagePath: './assets/brands/other-3.PNG' },
     ],
   },
 ];
@@ -669,7 +702,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
             }),
             addressLine2: fb.control<string>('', {
               nonNullable: true,
-              validators: [Validators.required],
+              validators: [],
             }),
             city: fb.control<string>('', {
               nonNullable: true,
@@ -891,7 +924,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
             }),
             addressLine2: fb.control<string>('', {
               nonNullable: true,
-              validators: [Validators.required],
+              validators: [],
             }),
             city: fb.control<string>('', {
               nonNullable: true,
@@ -1460,7 +1493,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
 
   onPatientRadioChange(value: boolean) {
     const patientContactInfo = this.userDetailsFormGroup.get('patientInformation.patient.contactInformation');
-    const contactFields = ['addressLine1', 'addressLine2', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
+    const contactFields = ['addressLine1', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
 
     contactFields.forEach(contact => {
       const control = patientContactInfo?.get(contact);
@@ -1473,7 +1506,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
 
   onNonPatientReporterRadioChange(value: boolean) {
     const patientReporterContactInfo = this.userDetailsFormGroup.get('patientReporterInformation.patient.contactInformation');
-    const contactFields = ['addressLine1', 'addressLine2', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
+    const contactFields = ['addressLine1', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
 
     contactFields.forEach(contact => {
       const control = patientReporterContactInfo?.get(contact);

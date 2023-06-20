@@ -167,7 +167,7 @@
                         [alt]="product.name"
                       />
                       </div>
-                      <div class="fw-semibold py-2">{{ product.name }}</div>
+                      <div class="image-caption fw-semibold w-100 py-2 text-center">{{ product.name }}</div>
                     </div>
                   </label>
                 </ng-container>
@@ -343,11 +343,11 @@
                 appearance="outline"
               >
                 <mat-label
-                  >Are you willing to return the product back to us</mat-label
+                  >Are you willing to return the product back to us (Field product return pre-paid kit will be provided)</mat-label
                 >
-                <mat-hint
+                <!-- <mat-hint
                   >Field product return pre-paid kit will be provided</mat-hint
-                >
+                > -->
                 <mat-select formControlName="returnOption">
                   <mat-option
                     *ngFor="let option of returnOptionValues"
@@ -762,10 +762,10 @@
                         class="default-control-width mb-2"
                         appearance="outline"
                       >
-                        <mat-label>State</mat-label>
+                        <mat-label>State/Province</mat-label>
                         <input
                           matInput
-                          placeholder="State"
+                          placeholder="State/Province"
                           formControlName="state"
                         />
                       </mat-form-field>
@@ -801,7 +801,43 @@
                   </div>
                 </div>
 
-                <div>
+                <div class="row">
+                  <div class="col-sm-12 col-lg-6">
+                    <mat-form-field
+                      class="default-control-width mb-2"
+                      appearance="outline"
+                    >
+                      <mat-label>Date of Birth</mat-label>
+                      <input
+                        matInput
+                        [matDatepicker]="dobPicker"
+                        placeholder="Date of Birth"
+                        formControlName="dateOfBirth"
+                      />
+                      <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
+                      <mat-datepicker-toggle
+                        matIconSuffix
+                        [for]="dobPicker"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #dobPicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-sm-12 col-lg-6">
+                    <mat-form-field
+                      class="default-control-width mb-2"
+                      appearance="outline"
+                    >
+                      <mat-label>Age at Complaint</mat-label>
+                      <input
+                        matInput
+                        placeholder="Age at Complaint"
+                        formControlName="ageAtComplaint"
+                      />
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <div *ngIf="complaintReportingFormGroup.controls.returnOption.value === 'Yes'">
                   <div class="mb-2">
                     <div>
                       <label>Is the product available at this address?</label>
@@ -914,10 +950,10 @@
                         class="default-control-width mb-2"
                         appearance="outline"
                       >
-                        <mat-label>State</mat-label>
+                        <mat-label>State/Province</mat-label>
                         <input
                           matInput
-                          placeholder="State"
+                          placeholder="State/Province"
                           formControlName="state"
                         />
                       </mat-form-field>
@@ -953,41 +989,8 @@
                   </div>
                 </div>
 
-                <div class="row">
-                  <div class="col-sm-12 col-lg-6">
-                    <mat-form-field
-                      class="default-control-width mb-2"
-                      appearance="outline"
-                    >
-                      <mat-label>Date of Birth</mat-label>
-                      <input
-                        matInput
-                        [matDatepicker]="dobPicker"
-                        placeholder="Date of Birth"
-                        formControlName="dateOfBirth"
-                      />
-                      <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
-                      <mat-datepicker-toggle
-                        matIconSuffix
-                        [for]="dobPicker"
-                      ></mat-datepicker-toggle>
-                      <mat-datepicker #dobPicker></mat-datepicker>
-                    </mat-form-field>
-                  </div>
-                  <div class="col-sm-12 col-lg-6">
-                    <mat-form-field
-                      class="default-control-width mb-2"
-                      appearance="outline"
-                    >
-                      <mat-label>Age at Complaint</mat-label>
-                      <input
-                        matInput
-                        placeholder="Age at Complaint"
-                        formControlName="ageAtComplaint"
-                      />
-                    </mat-form-field>
-                  </div>
-                </div>
+                
+
               </div>
               <div
                 *ngIf="
@@ -1165,10 +1168,10 @@
                         class="default-control-width mb-2"
                         appearance="outline"
                       >
-                        <mat-label>State</mat-label>
+                        <mat-label>State/Province</mat-label>
                         <input
                           matInput
-                          placeholder="State"
+                          placeholder="State/Province"
                           formControlName="state"
                         />
                       </mat-form-field>
@@ -1581,10 +1584,10 @@
                         class="default-control-width mb-2"
                         appearance="outline"
                       >
-                        <mat-label>State</mat-label>
+                        <mat-label>State/Province</mat-label>
                         <input
                           matInput
-                          placeholder="State"
+                          placeholder="State/Province"
                           formControlName="state"
                         />
                       </mat-form-field>
@@ -1620,7 +1623,42 @@
                   </div>
                 </div>
 
-                <div>
+                <div class="row">
+                  <div class="col-sm-12 col-lg-6">
+                    <mat-form-field
+                      class="default-control-width mb-2"
+                      appearance="outline"
+                    >
+                      <mat-label>Date of Birth</mat-label>
+                      <input
+                        matInput
+                        [matDatepicker]="dobPicker"
+                        formControlName="dateOfBirth"
+                      />
+                      <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
+                      <mat-datepicker-toggle
+                        matIconSuffix
+                        [for]="dobPicker"
+                      ></mat-datepicker-toggle>
+                      <mat-datepicker #dobPicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-sm-12 col-lg-6">
+                    <mat-form-field
+                      class="default-control-width mb-2"
+                      appearance="outline"
+                    >
+                      <mat-label>Age at Complaint</mat-label>
+                      <input
+                        matInput
+                        placeholder="Age at Complaint"
+                        formControlName="ageAtComplaint"
+                      />
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <div *ngIf="complaintReportingFormGroup.controls.returnOption.value === 'Yes'">
                   <div class="mb-2">
                     <div>
                       <label>Is the product available at this address?</label>
@@ -1733,10 +1771,10 @@
                         class="default-control-width mb-2"
                         appearance="outline"
                       >
-                        <mat-label>State</mat-label>
+                        <mat-label>State/Province</mat-label>
                         <input
                           matInput
-                          placeholder="State"
+                          placeholder="State/Province"
                           formControlName="state"
                         />
                       </mat-form-field>
@@ -1770,42 +1808,7 @@
                       </mat-form-field>
                     </div>
                   </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-sm-12 col-lg-6">
-                    <mat-form-field
-                      class="default-control-width mb-2"
-                      appearance="outline"
-                    >
-                      <mat-label>Date of Birth</mat-label>
-                      <input
-                        matInput
-                        [matDatepicker]="dobPicker"
-                        formControlName="dateOfBirth"
-                      />
-                      <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
-                      <mat-datepicker-toggle
-                        matIconSuffix
-                        [for]="dobPicker"
-                      ></mat-datepicker-toggle>
-                      <mat-datepicker #dobPicker></mat-datepicker>
-                    </mat-form-field>
-                  </div>
-                  <div class="col-sm-12 col-lg-6">
-                    <mat-form-field
-                      class="default-control-width mb-2"
-                      appearance="outline"
-                    >
-                      <mat-label>Age at Complaint</mat-label>
-                      <input
-                        matInput
-                        placeholder="Age at Complaint"
-                        formControlName="ageAtComplaint"
-                      />
-                    </mat-form-field>
-                  </div>
-                </div>
+                </div>                
               </div>
               <div formGroupName="reporter">
                 <p class="fw-semibold">Reporter Details</p>
@@ -1932,10 +1935,10 @@
                         class="default-control-width mb-2"
                         appearance="outline"
                       >
-                        <mat-label>State</mat-label>
+                        <mat-label>State/Province</mat-label>
                         <input
                           matInput
-                          placeholder="State"
+                          placeholder="State/Province"
                           formControlName="state"
                         />
                       </mat-form-field>
@@ -2400,7 +2403,7 @@
                 <input matInput placeholder="City" formControlName="city" />
               </mat-form-field>
               <mat-form-field class="default-control-width">
-                <mat-label>State</mat-label>
+                <mat-label>State/Province</mat-label>
                 <input
                   type="text"
                   matInput

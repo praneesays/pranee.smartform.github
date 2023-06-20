@@ -262,6 +262,7 @@ export enum ProductTypes {
   Patch = 'patch',
   Ampule = 'ampule',
   Other = 'other',
+  Unknown = 'unknown'
 }
 
 export enum AdministeredBy {
