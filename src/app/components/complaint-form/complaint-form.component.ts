@@ -2,7 +2,6 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
   AbstractControl,
-  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -50,7 +49,6 @@ import {
   IProductDetails,
   IComplaintDetails,
   Country,
-  SameCountryReportStatus,
   IUserDetails,
   IPatientInformation,
   IPatientReporterInformation,
@@ -61,7 +59,6 @@ import {
   DrugAbuseStatus,
   Gender,
   IContactInformation,
-  IPatientMedicalHistory,
   PhysicianAwareness,
   ReporterAdministration,
   SmokingStatus,
@@ -75,12 +72,9 @@ import {
   IHCPDetails,
   Product,
   Brand,
-  Height,
-  Weight,
   HeightUnit,
   WeightUnit,
   ConsumptionUnit,
-  Consumption,
   ReturnOption,
   IHcpData,
 } from '../../types';
@@ -442,6 +436,8 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
   consumptionUnitValues: string[] = Object.values(ConsumptionUnit);
   returnOptionValues: string[] = Object.values(ReturnOption);
 
+  countriesList?: Observable<string[]>;
+
   privacyPolicyChecked = false;
 
   showMedicalHistory: boolean = false;
@@ -478,6 +474,11 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
 
   showAllProducts: boolean = true; 
   selectedProductIndex: number = -1; 
+
+  filteredProducts: Product[] = products;
+
+  filteredBrands: Brand[] = [];
+  selectedBrand: string = '';
 
   constructor(
     private readonly bottomSheet: MatBottomSheet,
@@ -1446,6 +1447,11 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
         ],
       },
     ];
+
+    this.products.forEach(product => {
+      this.filteredBrands = product.name === 'Unknown' ? product.brands : []
+      this.sortBrands(product.brands)
+    });    
   }
 
   onStepSelectionChange(event: StepperSelectionEvent) {
@@ -1456,7 +1462,34 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
     this.progressBarService.setProgressValue(newProgressValue);
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    const patientContactInfo = this.userDetailsFormGroup.get('patientInformation.patient.contactInformation');
+    const patientReporterContactInfo = this.userDetailsFormGroup.get('patientReporterInformation.patient.contactInformation');
+
+    if (this.complaintReportingFormGroup.controls.purchasedCountry) {
+      this.countriesList = this.complaintReportingFormGroup.controls.purchasedCountry.valueChanges.pipe(
+        startWith(''),
+        map(value => this._filter(value || ''))
+      )
+    } else if (patientContactInfo?.get('country')) {
+      this.countriesList = patientContactInfo?.get('country')?.valueChanges.pipe(
+        startWith(''),
+        map(value => this._filter(value || ''))
+      )
+    } else if (patientReporterContactInfo?.get('country')) {
+      this.countriesList = patientReporterContactInfo?.get('country')?.valueChanges.pipe(
+        startWith(''),
+        map(value => this._filter(value || ''))
+      )
+    }
+    
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.countries.filter(country => country.toLowerCase().includes(filterValue));
+  }
 
   ngAfterViewInit(): void {
     this.complaintReportingFormGroup.controls.product.valueChanges.subscribe((product) => {
@@ -1470,6 +1503,74 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
         this.scrollToStrengthSection();
       }
     });
+  }
+
+  filterbrands(filter: string, productName: string) {
+    const productList = this.products.find(product => product.name == productName);
+
+    if (productList) {
+      if (productName === 'Unknown') {
+        this.filteredBrands = productList.brands.filter(brand => 
+          filter ? 
+          brand.name.charAt(0).toUpperCase() >= filter.charAt(0).toUpperCase() && 
+          brand.name.charAt(0).toUpperCase() <= filter.charAt(2).toUpperCase() 
+          : true)
+      } else {
+        this.filteredBrands = productList.brands;
+      }
+      
+      // switch(filter) {
+      //   case 'A-C':
+      //     this.filteredProducts = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='A' && brand.name.charAt(0).toUpperCase() <= 'C'
+      //     )
+      //     break;
+      //   case 'D-F':
+      //     this.filteredBrands = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='D' && brand.name.charAt(0).toUpperCase() <= 'F'
+      //     )
+      //     break;
+      //   case 'G-I':
+      //     this.filteredBrands = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='G' && brand.name.charAt(0).toUpperCase() <= 'I'
+      //     )
+      //     break;
+      //   case 'J-L':
+      //     this.filteredBrands = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='J' && brand.name.charAt(0).toUpperCase() <= 'L'
+      //     )
+      //     break;
+      //   case 'M-O':
+      //     this.filteredBrands = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='M' && brand.name.charAt(0).toUpperCase() <= 'O'
+      //     )
+      //     break;
+      //   case 'P-R':
+      //     this.filteredBrands = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='P' && brand.name.charAt(0).toUpperCase() <= 'R'
+      //     )
+      //     break;
+      //   case 'S-U':
+      //     this.filteredBrands = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='S' && brand.name.charAt(0).toUpperCase() <= 'U'
+      //     )
+      //     break;
+      //   case 'V-Z':
+      //     this.filteredBrands = product.brands.filter(brand => 
+      //       brand.name.charAt(0).toUpperCase() >='V' && brand.name.charAt(0).toUpperCase() <= 'Z'
+      //     )
+      //     break;
+      //   default:
+      //     this.filteredBrands = [...product.brands]
+      //     break;
+      // }
+    }
+    this.sortBrands(this.filteredBrands);
+    this.selectedBrand = filter;
+  }
+
+  sortBrands(brands: Brand[]) {
+    brands.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   private scrollToItemSection(): void {
@@ -1633,6 +1734,8 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
   onBrandSelectionChange(brandName: string): void {
     this.selectedBrandControl.setValue(brandName);
     // this.scrollToStrengthSection();
+    this.filteredProducts = this.products.filter(product => product.brands.some(brand => brand.name.toLowerCase() === brandName) && product.name !== 'Unknown' )
+    console.log(this.filteredProducts) 
   }
 
   private _filterGroup(value: string): StateGroup[] {

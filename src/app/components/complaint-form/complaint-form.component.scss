@@ -288,6 +288,18 @@ mat-expansion-panel-header.invalid {
   // }
 }
 
+
+.brands_section {
+  .filter-section {
+    button {
+      &.active {
+        background-color: $primary-color;
+        color: #fff;
+      }
+    }
+  }
+}
+
 .mat-step-header .mat-step-icon-selected {
   background-color: $primary-color;
 }

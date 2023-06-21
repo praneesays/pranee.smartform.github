@@ -62,13 +62,30 @@
                 <mat-label
                   >Which country the product was purchased in?</mat-label
                 >
-                <mat-select formControlName="purchasedCountry">
+                <input
+                  type="text"
+                  placeholder="Which country the product was purchased in?"
+                  aria-label="Country"
+                  matInput
+                  formControlName="purchasedCountry"
+                  [matAutocomplete]="auto"
+                />
+
+                <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                  <mat-option
+                    *ngFor="let country of countriesList | async"
+                    [value]="country"
+                  >
+                    {{ country }}
+                  </mat-option>
+                </mat-autocomplete>
+                <!-- <mat-select formControlName="purchasedCountry">
                   <mat-option
                     *ngFor="let country of countries"
                     [value]="country"
                     >{{ country }}</mat-option
                   >
-                </mat-select>
+                </mat-select> -->
               </mat-form-field>
             </div>
             <!-- <h2 class="mt-4 mb-2">
@@ -145,7 +162,7 @@
                         />
                     <div class="fw-semibold">{{ product.name }}</div>
                 </div> -->
-              <div class="d-flex flex-wrap gap-4 mx-2 my-2 align-items-end">
+              <div class="d-flex flex-wrap gap-4 mx-0 mx-md-2 my-2 align-items-end">
                 <ng-container *ngFor="let product of products; let i = index">
                   <label *ngIf="showAllProducts || selectedProductIndex === i">
                     <input
@@ -161,13 +178,17 @@
                     >
                       <div class="image-section">
                         <img
-                        [ngSrc]="product.imagePath"
-                        width="150"
-                        height="150"
-                        [alt]="product.name"
-                      />
+                          [ngSrc]="product.imagePath"
+                          width="150"
+                          height="150"
+                          [alt]="product.name"
+                        />
                       </div>
-                      <div class="image-caption fw-semibold w-100 py-2 text-center">{{ product.name }}</div>
+                      <div
+                        class="image-caption fw-semibold w-100 py-2 text-center"
+                      >
+                        {{ product.name }}
+                      </div>
                     </div>
                   </label>
                 </ng-container>
@@ -195,33 +216,110 @@
               >
                 <h2 class="mb-1">Select a brand below</h2>
                 <ng-container *ngFor="let product of products">
-                  <div
-                    class="d-flex flex-wrap gap-4 mx-2 my-2"
+                  <div class="d-flex flex-column mx-0 mx-md-2 my-2"
                     *ngIf="
                       complaintReportingFormGroup.controls.product.value ===
                       product.name
                     "
                   >
-                    <label *ngFor="let brand of product.brands">
-                      <input
-                        type="radio"
-                        name="brand"
-                        [value]="brand.name"
-                        formControlName="brand"
-                        (change)="onBrandSelectionChange(brand.name)"
-                        class="mb-2" 
-                      />
-                      <div
-                        class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
-                      >
-                        <img
-                          [ngSrc]="brand.imagePath"
-                          width="150"
-                          height="150"
-                          [alt]="brand.name"
-                        />
+                    <div
+                      class="filter-section d-flex flex-column mb-3 gap-3"
+                      *ngIf="
+                        complaintReportingFormGroup.controls.product.value ===
+                        'Unknown'
+                      "
+                    >
+                      <div class="d-flex align-items-center gap-3">
+                        <h3
+                          class="fw-semibold mb-0 lh-base fs-6 text-secondary-emphasis"
+                        >
+                          Filter:
+                        </h3>
+                        <div class="d-flex gap-2">
+                          <button
+                            *ngFor="
+                              let letter of [
+                                'A-C',
+                                'D-F',
+                                'G-I',
+                                'J-L',
+                                'M-O',
+                                'P-R',
+                                'S-U',
+                                'V-Z'
+                              ]
+                            "
+                            mat-stroked-button
+                            color="secondary"
+                            (click)="filterbrands(letter, product.name)"
+                            [class.active]="selectedBrand === letter"
+                          >
+                            {{ letter }}
+                          </button>
+                        </div>
                       </div>
-                    </label>
+
+                      <div class="d-flex flex-wrap gap-4">
+                        <ng-container
+                          *ngIf="filteredBrands.length > 0; else noBrands"
+                        >
+                          <label *ngFor="let brand of filteredBrands">
+                            <input
+                              type="radio"
+                              name="brand"
+                              [value]="brand.name"
+                              formControlName="brand"
+                              (change)="onBrandSelectionChange(brand.name)"
+                              class="mb-2"
+                            />
+                            <div
+                              class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
+                            >
+                              <img
+                                [ngSrc]="brand.imagePath"
+                                width="150"
+                                height="150"
+                                [alt]="brand.name"
+                              />
+                            </div>
+                          </label>
+                        </ng-container>
+                        <ng-template #noBrands>
+                          <h3 class="fw-normal mb-0">
+                            No brands associated with this filter.
+                          </h3>
+                        </ng-template>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-4">
+                      <ng-container
+                        *ngIf="
+                          complaintReportingFormGroup.controls.product.value !==
+                          'Unknown'
+                        "
+                      >
+                        <label *ngFor="let brand of product.brands">
+                          <input
+                            type="radio"
+                            name="brand"
+                            [value]="brand.name"
+                            formControlName="brand"
+                            (change)="onBrandSelectionChange(brand.name)"
+                            class="mb-2"
+                          />
+                          <div
+                            class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
+                          >
+                            <img
+                              [ngSrc]="brand.imagePath"
+                              width="150"
+                              height="150"
+                              [alt]="brand.name"
+                            />
+                          </div>
+                        </label>
+                      </ng-container>
+                    </div>
                   </div>
                 </ng-container>
                 <!-- </ng-container>
@@ -315,8 +413,54 @@
             </div> -->
           </ng-container>
 
-          <div class="my-3"
-            *ngIf="complaintReportingFormGroup.controls.brand.value" #strengthSection
+          <div
+            class="products_section vertical-tabs-section"
+            *ngIf="
+              complaintReportingFormGroup.controls.product.value ===
+                'Unknown' && complaintReportingFormGroup.controls.brand.value
+            "
+            #strengthSection
+          >
+            <h2 class="mb-1">Select a Product below</h2>
+            <div class="d-flex flex-wrap gap-4 mx-0 mx-md-2 my-2 align-items-end">
+              <ng-container
+                *ngFor="let product of filteredProducts; let i = index"
+              >
+                <label>
+                  <input
+                    type="radio"
+                    name="product"
+                    [value]="product.name"
+                    formControlName="product"
+                    (change)="onProductSelectionChange(i)"
+                    class="mb-2"
+                  />
+                  <div
+                    class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
+                  >
+                    <div class="image-section">
+                      <img
+                        [ngSrc]="product.imagePath"
+                        width="150"
+                        height="150"
+                        [alt]="product.name"
+                      />
+                    </div>
+                    <div
+                      class="image-caption fw-semibold w-100 py-2 text-center"
+                    >
+                      {{ product.name }}
+                    </div>
+                  </div>
+                </label>
+              </ng-container>
+            </div>
+          </div>
+
+          <div
+            class="my-3"
+            *ngIf="complaintReportingFormGroup.controls.brand.value"
+            #strengthSection
           >
             <div class="mt-3">
               <mat-form-field
@@ -337,13 +481,14 @@
               </mat-form-field>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-0">
               <mat-form-field
                 class="default-control-width"
                 appearance="outline"
               >
                 <mat-label
-                  >Are you willing to return the product back to us (Field product return pre-paid kit will be provided)</mat-label
+                  >Can you return the product back to us (Field product return
+                  pre-paid kit will be provided)</mat-label
                 >
                 <!-- <mat-hint
                   >Field product return pre-paid kit will be provided</mat-hint
@@ -733,13 +878,26 @@
                         appearance="outline"
                       >
                         <mat-label>Country</mat-label>
-                        <mat-select formControlName="country">
+                        <input
+                          type="text"
+                          placeholder="Country"
+                          aria-label="Country"
+                          matInput
+                          formControlName="country"
+                          [matAutocomplete]="auto"
+                        />
+
+                        <mat-autocomplete
+                          autoActiveFirstOption
+                          #auto="matAutocomplete"
+                        >
                           <mat-option
-                            *ngFor="let country of countries"
+                            *ngFor="let country of countriesList | async"
                             [value]="country"
-                            >{{ country }}</mat-option
                           >
-                        </mat-select>
+                            {{ country }}
+                          </mat-option>
+                        </mat-autocomplete>
                       </mat-form-field>
                     </div>
                   </div>
@@ -837,7 +995,12 @@
                   </div>
                 </div>
 
-                <div *ngIf="complaintReportingFormGroup.controls.returnOption.value === 'Yes'">
+                <div
+                  *ngIf="
+                    complaintReportingFormGroup.controls.returnOption.value ===
+                    'Yes'
+                  "
+                >
                   <div class="mb-2">
                     <div>
                       <label>Is the product available at this address?</label>
@@ -921,13 +1084,26 @@
                         appearance="outline"
                       >
                         <mat-label>Country</mat-label>
-                        <mat-select formControlName="country">
+                        <input
+                          type="text"
+                          placeholder="Country"
+                          aria-label="Country"
+                          matInput
+                          formControlName="country"
+                          [matAutocomplete]="auto"
+                        />
+
+                        <mat-autocomplete
+                          autoActiveFirstOption
+                          #auto="matAutocomplete"
+                        >
                           <mat-option
-                            *ngFor="let country of countries"
+                            *ngFor="let country of countriesList | async"
                             [value]="country"
-                            >{{ country }}</mat-option
                           >
-                        </mat-select>
+                            {{ country }}
+                          </mat-option>
+                        </mat-autocomplete>
                       </mat-form-field>
                     </div>
                   </div>
@@ -988,9 +1164,6 @@
                     </div>
                   </div>
                 </div>
-
-                
-
               </div>
               <div
                 *ngIf="
@@ -1139,13 +1312,26 @@
                         appearance="outline"
                       >
                         <mat-label>Country</mat-label>
-                        <mat-select formControlName="country">
+                        <input
+                          type="text"
+                          placeholder="Country"
+                          aria-label="Country"
+                          matInput
+                          formControlName="country"
+                          [matAutocomplete]="auto"
+                        />
+
+                        <mat-autocomplete
+                          autoActiveFirstOption
+                          #auto="matAutocomplete"
+                        >
                           <mat-option
-                            *ngFor="let country of countries"
+                            *ngFor="let country of countriesList | async"
                             [value]="country"
-                            >{{ country }}</mat-option
                           >
-                        </mat-select>
+                            {{ country }}
+                          </mat-option>
+                        </mat-autocomplete>
                       </mat-form-field>
                     </div>
                   </div>
@@ -1555,13 +1741,26 @@
                         appearance="outline"
                       >
                         <mat-label>Country</mat-label>
-                        <mat-select formControlName="country">
+                        <input
+                          type="text"
+                          placeholder="Country"
+                          aria-label="Country"
+                          matInput
+                          formControlName="country"
+                          [matAutocomplete]="auto"
+                        />
+
+                        <mat-autocomplete
+                          autoActiveFirstOption
+                          #auto="matAutocomplete"
+                        >
                           <mat-option
-                            *ngFor="let country of countries"
+                            *ngFor="let country of countriesList | async"
                             [value]="country"
-                            >{{ country }}</mat-option
                           >
-                        </mat-select>
+                            {{ country }}
+                          </mat-option>
+                        </mat-autocomplete>
                       </mat-form-field>
                     </div>
                   </div>
@@ -1658,7 +1857,12 @@
                   </div>
                 </div>
 
-                <div *ngIf="complaintReportingFormGroup.controls.returnOption.value === 'Yes'">
+                <div
+                  *ngIf="
+                    complaintReportingFormGroup.controls.returnOption.value ===
+                    'Yes'
+                  "
+                >
                   <div class="mb-2">
                     <div>
                       <label>Is the product available at this address?</label>
@@ -1742,13 +1946,26 @@
                         appearance="outline"
                       >
                         <mat-label>Country</mat-label>
-                        <mat-select formControlName="country">
+                        <input
+                          type="text"
+                          placeholder="Country"
+                          aria-label="Country"
+                          matInput
+                          formControlName="country"
+                          [matAutocomplete]="auto"
+                        />
+
+                        <mat-autocomplete
+                          autoActiveFirstOption
+                          #auto="matAutocomplete"
+                        >
                           <mat-option
-                            *ngFor="let country of countries"
+                            *ngFor="let country of countriesList | async"
                             [value]="country"
-                            >{{ country }}</mat-option
                           >
-                        </mat-select>
+                            {{ country }}
+                          </mat-option>
+                        </mat-autocomplete>
                       </mat-form-field>
                     </div>
                   </div>
@@ -1808,7 +2025,7 @@
                       </mat-form-field>
                     </div>
                   </div>
-                </div>                
+                </div>
               </div>
               <div formGroupName="reporter">
                 <p class="fw-semibold">Reporter Details</p>
@@ -1906,13 +2123,26 @@
                         appearance="outline"
                       >
                         <mat-label>Country</mat-label>
-                        <mat-select formControlName="country">
+                        <input
+                          type="text"
+                          placeholder="Country"
+                          aria-label="Country"
+                          matInput
+                          formControlName="country"
+                          [matAutocomplete]="auto"
+                        />
+
+                        <mat-autocomplete
+                          autoActiveFirstOption
+                          #auto="matAutocomplete"
+                        >
                           <mat-option
-                            *ngFor="let country of countries"
+                            *ngFor="let country of countriesList | async"
                             [value]="country"
-                            >{{ country }}</mat-option
                           >
-                        </mat-select>
+                            {{ country }}
+                          </mat-option>
+                        </mat-autocomplete>
                       </mat-form-field>
                     </div>
                   </div>
