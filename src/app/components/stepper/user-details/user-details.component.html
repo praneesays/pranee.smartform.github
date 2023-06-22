@@ -1,0 +1,1251 @@
+<form
+  [formGroup]="userDetailsFormGroup"
+  class="w-100 h-100 d-flex flex-column gap-2"
+>
+  <ng-template matStepLabel>User Details</ng-template>
+
+  <div class="flex-grow-1 bg-white rounded-3 shadow px-3 px-sm-5 py-3 mt-2">
+    <div
+      *ngIf="
+        complaintReportingFormGroup.controls.userType.value ===
+        UserTypes.Patient
+      "
+      class="mt-2"
+    >
+      <h2>PATIENT INFORMATION</h2>
+      <div formGroupName="patientInformation">
+        <div>
+          <mat-form-field
+            class="default-control-width mb-2"
+            appearance="outline"
+          >
+            <mat-label
+              >Does J & J have permission to contact you about this
+              report?</mat-label
+            >
+            <mat-select formControlName="permissionToContact">
+              <mat-option
+                *ngFor="let option of permissionToContactValues"
+                [value]="option"
+                >{{ option }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div formGroupName="patient">
+          <div class="row">
+            <div class="col-sm-12 col-lg-2">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Title</mat-label>
+                <mat-select formControlName="title">
+                  <mat-option
+                    *ngFor="let option of titleOptions"
+                    [value]="option"
+                    >{{ option }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>First Name</mat-label>
+                <input
+                  matInput
+                  placeholder="First Name"
+                  formControlName="firstName"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Last Name</mat-label>
+                <input
+                  matInput
+                  placeholder="Last Name"
+                  formControlName="lastName"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div formGroupName="contactInformation">
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 1</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 1"
+                    formControlName="addressLine1"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 2</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 2"
+                    formControlName="addressLine2"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>City</mat-label>
+                  <input matInput placeholder="City" formControlName="city" />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Country</mat-label>
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    aria-label="Country"
+                    matInput
+                    formControlName="country"
+                    [matAutocomplete]="auto"
+                  />
+
+                  <mat-autocomplete
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
+                  >
+                    <mat-option
+                      *ngFor="let country of countriesList | async"
+                      [value]="country"
+                    >
+                      {{ country }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Postal Code</mat-label>
+                  <input
+                    matInput
+                    placeholder="Postal Code"
+                    formControlName="postalCode"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>State/Province</mat-label>
+                  <input
+                    matInput
+                    placeholder="State/Province"
+                    formControlName="state"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Telephone</mat-label>
+                  <input
+                    matInput
+                    placeholder="Telephone"
+                    formControlName="telephone"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Email Address</mat-label>
+                  <input
+                    matInput
+                    placeholder="Email Address"
+                    formControlName="emailAddress"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12 col-lg-6">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Date of Birth</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="dobPicker"
+                  placeholder="Date of Birth"
+                  formControlName="dateOfBirth"
+                />
+                <mat-datepicker-toggle
+                  matIconSuffix
+                  [for]="dobPicker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #dobPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-lg-6">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Age at Complaint</mat-label>
+                <input
+                  matInput
+                  placeholder="Age at Complaint"
+                  formControlName="ageAtComplaint"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div
+            *ngIf="
+              complaintReportingFormGroup.controls.returnOption.value === 'Yes'
+            "
+          >
+            <div class="mb-2">
+              <div>
+                <label>Is the product available at this address?</label>
+              </div>
+              <mat-radio-group
+                aria-label="Is the product available at this address?"
+                color="primary"
+                formControlName="isProductAvailable"
+              >
+                <mat-radio-button
+                  [value]="true"
+                  class="me-2"
+                  (change)="onPatientRadioChange($event.value)"
+                  >Yes</mat-radio-button
+                >
+                <mat-radio-button
+                  [value]="false"
+                  (change)="onPatientRadioChange($event.value)"
+                  >No</mat-radio-button
+                >
+              </mat-radio-group>
+            </div>
+          </div>
+
+          <div
+            *ngIf="
+              userDetailsFormGroup.get(
+                'patientInformation.patient.isProductAvailable'
+              )?.value === false
+            "
+            formGroupName="additionalContactInformation"
+          >
+            <h3 class="fw-semibold">
+              Please provide the below address details for pickup
+            </h3>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 1</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 1"
+                    formControlName="addressLine1"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 2</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 2"
+                    formControlName="addressLine2"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>City</mat-label>
+                  <input matInput placeholder="City" formControlName="city" />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Country</mat-label>
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    aria-label="Country"
+                    matInput
+                    formControlName="country"
+                    [matAutocomplete]="auto"
+                  />
+
+                  <mat-autocomplete
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
+                  >
+                    <mat-option
+                      *ngFor="let country of countriesList | async"
+                      [value]="country"
+                    >
+                      {{ country }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Postal Code</mat-label>
+                  <input
+                    matInput
+                    placeholder="Postal Code"
+                    formControlName="postalCode"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>State/Province</mat-label>
+                  <input
+                    matInput
+                    placeholder="State/Province"
+                    formControlName="state"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Telephone</mat-label>
+                  <input
+                    matInput
+                    placeholder="Telephone"
+                    formControlName="telephone"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Email Address</mat-label>
+                  <input
+                    matInput
+                    placeholder="Email Address"
+                    formControlName="emailAddress"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          *ngIf="
+            complaintReportingFormGroup.controls.userType.value ===
+              UserTypes.Patient ||
+            complaintReportingFormGroup.controls.userType.value ===
+              UserTypes.HealthcareProfessional
+          "
+        >
+          <mat-form-field
+            class="default-control-width mb-2"
+            appearance="outline"
+          >
+            <mat-label
+              >Is the physician or treating HCP aware of the
+              complaint?</mat-label
+            >
+            <mat-select formControlName="awareOfComplaint">
+              <mat-option
+                *ngFor="let option of physicianAwarenessValues"
+                [value]="option"
+                >{{ option }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div>
+          <mat-form-field
+            class="default-control-width mb-2"
+            appearance="outline"
+          >
+            <mat-label
+              >Does J & J have permission to contact your healthcare provider
+              about this report?</mat-label
+            >
+            <mat-select formControlName="permissionToContactHCP">
+              <mat-option
+                *ngFor="let option of permissionToContactHCPValues"
+                [value]="option"
+                >{{ option }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div
+          formGroupName="hcp"
+          *ngIf="
+            userDetailsFormGroup.get(
+              'patientInformation.permissionToContactHCP'
+            )?.value === 'Yes'
+          "
+        >
+          <p class="fw-semibold">Healthcare provider Details</p>
+          <div class="row">
+            <div class="col-sm-12 col-lg-2">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Title</mat-label>
+                <mat-select formControlName="title">
+                  <mat-option
+                    *ngFor="let option of titleOptions"
+                    [value]="option"
+                    >{{ option }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>First Name</mat-label>
+                <input
+                  matInput
+                  placeholder="First Name"
+                  formControlName="firstName"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Last Name</mat-label>
+                <input
+                  matInput
+                  placeholder="Last Name"
+                  formControlName="lastName"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div formGroupName="contactInformation">
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 1</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 1"
+                    formControlName="addressLine1"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 2</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 2"
+                    formControlName="addressLine2"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>City</mat-label>
+                  <input matInput placeholder="City" formControlName="city" />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Country</mat-label>
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    aria-label="Country"
+                    matInput
+                    formControlName="country"
+                    [matAutocomplete]="auto"
+                  />
+
+                  <mat-autocomplete
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
+                  >
+                    <mat-option
+                      *ngFor="let country of countriesList | async"
+                      [value]="country"
+                    >
+                      {{ country }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Postal Code</mat-label>
+                  <input
+                    matInput
+                    placeholder="Postal Code"
+                    formControlName="postalCode"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>State/Province</mat-label>
+                  <input
+                    matInput
+                    placeholder="State/Province"
+                    formControlName="state"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Telephone</mat-label>
+                  <input
+                    matInput
+                    placeholder="Telephone"
+                    formControlName="telephone"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Email Address</mat-label>
+                  <input
+                    matInput
+                    placeholder="Email Address"
+                    formControlName="emailAddress"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="
+        complaintReportingFormGroup.controls.userType.value !==
+          UserTypes.Patient &&
+        complaintReportingFormGroup.controls.userType.value !== null
+      "
+      class="mt-2"
+    >
+      <h2>PATIENT AND REPORTER INFORMATION</h2>
+      <div formGroupName="patientReporterInformation">
+        <div>
+          <mat-form-field
+            class="default-control-width mb-2"
+            appearance="outline"
+          >
+            <mat-label
+              >Does J&J have permission to contact the reporter?</mat-label
+            >
+            <mat-select formControlName="permissionToContactReporter">
+              <mat-option
+                *ngFor="let option of permissionToContactReporterValues"
+                [value]="option"
+                >{{ option }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div formGroupName="patient">
+          <p class="fw-semibold">Patient Details</p>
+          <div class="row">
+            <div class="col-sm-12 col-lg-2">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Title</mat-label>
+                <mat-select formControlName="title">
+                  <mat-option
+                    *ngFor="let option of titleOptions"
+                    [value]="option"
+                    >{{ option }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>First Name</mat-label>
+                <input
+                  matInput
+                  placeholder="First Name"
+                  formControlName="firstName"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Last Name</mat-label>
+                <input
+                  matInput
+                  placeholder="Last Name"
+                  formControlName="lastName"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div formGroupName="contactInformation">
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 1</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 1"
+                    formControlName="addressLine1"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 2</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 2"
+                    formControlName="addressLine2"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>City</mat-label>
+                  <input matInput placeholder="City" formControlName="city" />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Country</mat-label>
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    aria-label="Country"
+                    matInput
+                    formControlName="country"
+                    [matAutocomplete]="auto"
+                  />
+
+                  <mat-autocomplete
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
+                  >
+                    <mat-option
+                      *ngFor="let country of countriesList | async"
+                      [value]="country"
+                    >
+                      {{ country }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Postal Code</mat-label>
+                  <input
+                    matInput
+                    placeholder="Postal Code"
+                    formControlName="postalCode"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>State/Province</mat-label>
+                  <input
+                    matInput
+                    placeholder="State/Province"
+                    formControlName="state"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Telephone</mat-label>
+                  <input
+                    matInput
+                    placeholder="Telephone"
+                    formControlName="telephone"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Email Address</mat-label>
+                  <input
+                    matInput
+                    placeholder="Email Address"
+                    formControlName="emailAddress"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12 col-lg-6">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Date of Birth</mat-label>
+                <input
+                  matInput
+                  [matDatepicker]="dobPicker"
+                  formControlName="dateOfBirth"
+                />
+                <mat-datepicker-toggle
+                  matIconSuffix
+                  [for]="dobPicker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #dobPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-lg-6">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Age at Complaint</mat-label>
+                <input
+                  matInput
+                  placeholder="Age at Complaint"
+                  formControlName="ageAtComplaint"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div
+            *ngIf="
+              complaintReportingFormGroup.controls.returnOption.value === 'Yes'
+            "
+          >
+            <div class="mb-2">
+              <div>
+                <label>Is the product available at this address?</label>
+              </div>
+              <mat-radio-group
+                aria-label="Is the product available at this address?"
+                color="primary"
+                formControlName="isProductAvailable"
+              >
+                <mat-radio-button
+                  [value]="true"
+                  class="me-2"
+                  (change)="onNonPatientReporterRadioChange($event.value)"
+                  >Yes</mat-radio-button
+                >
+                <mat-radio-button
+                  [value]="false"
+                  (change)="onNonPatientReporterRadioChange($event.value)"
+                  >No</mat-radio-button
+                >
+              </mat-radio-group>
+            </div>
+          </div>
+
+          <div
+            *ngIf="
+              userDetailsFormGroup.get(
+                'patientReporterInformation.patient.isProductAvailable'
+              )?.value === false
+            "
+            formGroupName="additionalContactInformation"
+          >
+            <h3 class="fw-semibold">
+              Please provide the below address details for pickup
+            </h3>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 1</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 1"
+                    formControlName="addressLine1"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 2</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 2"
+                    formControlName="addressLine2"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>City</mat-label>
+                  <input matInput placeholder="City" formControlName="city" />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Country</mat-label>
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    aria-label="Country"
+                    matInput
+                    formControlName="country"
+                    [matAutocomplete]="auto"
+                  />
+
+                  <mat-autocomplete
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
+                  >
+                    <mat-option
+                      *ngFor="let country of countriesList | async"
+                      [value]="country"
+                    >
+                      {{ country }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Postal Code</mat-label>
+                  <input
+                    matInput
+                    placeholder="Postal Code"
+                    formControlName="postalCode"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>State/Province</mat-label>
+                  <input
+                    matInput
+                    placeholder="State/Province"
+                    formControlName="state"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Telephone</mat-label>
+                  <input
+                    matInput
+                    placeholder="Telephone"
+                    formControlName="telephone"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Email Address</mat-label>
+                  <input
+                    matInput
+                    placeholder="Email Address"
+                    formControlName="emailAddress"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div formGroupName="reporter">
+          <p class="fw-semibold">Reporter Details</p>
+          <div class="row">
+            <div class="col-sm-12 col-lg-2">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Title</mat-label>
+                <mat-select formControlName="title">
+                  <mat-option
+                    *ngFor="let option of titleOptions"
+                    [value]="option"
+                    >{{ option }}</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>First Name</mat-label>
+                <input
+                  matInput
+                  placeholder="First Name"
+                  formControlName="firstName"
+                />
+              </mat-form-field>
+            </div>
+
+            <div class="col-sm-12 col-lg-5">
+              <mat-form-field
+                class="default-control-width mb-2"
+                appearance="outline"
+              >
+                <mat-label>Last Name</mat-label>
+                <input
+                  matInput
+                  placeholder="Last Name"
+                  formControlName="lastName"
+                />
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div formGroupName="contactInformation">
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 1</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 1"
+                    formControlName="addressLine1"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Address Line 2</mat-label>
+                  <input
+                    matInput
+                    placeholder="Address Line 2"
+                    formControlName="addressLine2"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>City</mat-label>
+                  <input matInput placeholder="City" formControlName="city" />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Country</mat-label>
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    aria-label="Country"
+                    matInput
+                    formControlName="country"
+                    [matAutocomplete]="auto"
+                  />
+
+                  <mat-autocomplete
+                    autoActiveFirstOption
+                    #auto="matAutocomplete"
+                  >
+                    <mat-option
+                      *ngFor="let country of countriesList | async"
+                      [value]="country"
+                    >
+                      {{ country }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Postal Code</mat-label>
+                  <input
+                    matInput
+                    placeholder="Postal Code"
+                    formControlName="postalCode"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>State/Province</mat-label>
+                  <input
+                    matInput
+                    placeholder="State/Province"
+                    formControlName="state"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Telephone</mat-label>
+                  <input
+                    matInput
+                    placeholder="Telephone"
+                    formControlName="telephone"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-sm-12 col-lg-6">
+                <mat-form-field
+                  class="default-control-width mb-2"
+                  appearance="outline"
+                >
+                  <mat-label>Email Address</mat-label>
+                  <input
+                    matInput
+                    placeholder="Email Address"
+                    formControlName="emailAddress"
+                  />
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <mat-form-field
+            class="default-control-width mb-2"
+            appearance="outline"
+          >
+            <mat-label>Facility Name</mat-label>
+            <input
+              matInput
+              placeholder="Permission to Contact"
+              formControlName="facilityName"
+            />
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field
+            class="default-control-width mb-2"
+            appearance="outline"
+          >
+            <mat-label>Did the reporter administer the product?</mat-label>
+            <mat-select formControlName="reporterAdministeredProduct">
+              <mat-option
+                *ngFor="let option of reporterAdministrationValues"
+                [value]="option"
+                >{{ option }}</mat-option
+              >
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-4 d-flex justify-content-between w-100">
+    <button mat-stroked-button color="secondary" matStepperPrevious>
+      <mat-icon>arrow_back</mat-icon> Back
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      class="primary-btn"
+      matStepperNext
+    >
+      Continue <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+    </button>
+  </div>
+</form>

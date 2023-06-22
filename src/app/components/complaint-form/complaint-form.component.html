@@ -162,7 +162,7 @@
                         />
                     <div class="fw-semibold">{{ product.name }}</div>
                 </div> -->
-              <div class="d-flex flex-wrap gap-4 mx-0 mx-md-2 my-2 align-items-end">
+              <div class="d-flex flex-wrap gap-2 gap-md-4 mx-0 mx-md-2 my-2 align-items-end">
                 <ng-container *ngFor="let product of products; let i = index">
                   <label *ngIf="showAllProducts || selectedProductIndex === i">
                     <input
@@ -291,7 +291,7 @@
                         </ng-template>
                       </div>
                     </div>
-                    <div class="d-flex flex-wrap gap-4">
+                    <div class="d-flex flex-wrap gap-2 gap-md-4">
                       <ng-container
                         *ngIf="
                           complaintReportingFormGroup.controls.product.value !==
@@ -422,7 +422,7 @@
             #strengthSection
           >
             <h2 class="mb-1">Select a Product below</h2>
-            <div class="d-flex flex-wrap gap-4 mx-0 mx-md-2 my-2 align-items-end">
+            <div class="d-flex flex-wrap gap-2 gap-md-4 mx-0 mx-md-2 my-2 align-items-end">
               <ng-container
                 *ngFor="let product of filteredProducts; let i = index"
               >

@@ -24,6 +24,10 @@ import { DateAdapter } from '@angular/material/core';
 import { Router } from '@angular/router';
 import { tokenRouterListener } from './shared/token.router.listener';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { StepperComponent } from './components/stepper/stepper.component';
+import { UserDetailsComponent } from './components/stepper/user-details/user-details.component';
+import { ComplaintReportingComponent } from './components/stepper/complaint-reporting/complaint-reporting.component';
+import { ReviewComponent } from './components/stepper/review/review.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +43,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ProblemDescriptionFormComponent,
     LocaleSelectorModalComponent,
     LocaleSelectorComponent,
+    StepperComponent,
+    UserDetailsComponent,
+    ComplaintReportingComponent,
+    ReviewComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,5 +1,11 @@
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -10,12 +16,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { MatStepper, StepperOrientation } from '@angular/material/stepper';
+import { MatStepper } from '@angular/material/stepper';
 import { ActivatedRoute } from '@angular/router';
 import { DateTime } from 'luxon';
 import {
   filter,
-  first,
   map,
   Observable,
   of,
@@ -81,7 +86,7 @@ import {
 import { ProgressBarService } from 'src/app/services/progress-bar.service';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 
-type FormGroupType<T> = {
+export type FormGroupType<T> = {
   [k in keyof T]: T[k] extends
     | string
     | DateTime
@@ -118,7 +123,7 @@ const products: Product[] = [
     type: ProductTypes.OnePressDevice,
     imagePath: './assets/products/onepressdevice.png',
     brands: [
-      { name: 'Tremfya', imagePath: './assets/brands/Tremfya.png' },
+      { name: 'tremfya', imagePath: './assets/brands/onePressDevice-1.PNG' },
     ],
   },
   {
@@ -126,9 +131,18 @@ const products: Product[] = [
     type: ProductTypes.PrefilledSyringe,
     imagePath: './assets/products/prefilledsyringe.png',
     brands: [
-      { name: 'Stelara', imagePath: './assets/brands/Stelara.png' },
-      { name: 'Tremfya', imagePath: './assets/brands/Tremfya.png' },
-      { name: 'Invega', imagePath: './assets/brands/Invega.png' },
+      {
+        name: 'stelara',
+        imagePath: './assets/brands/prefilledSyringe-1.PNG',
+      },
+      {
+        name: 'tremfya',
+        imagePath: './assets/brands/prefilledSyringe-2.PNG',
+      },
+      {
+        name: 'hafyera',
+        imagePath: './assets/brands/prefilledSyringe-3.PNG',
+      },
     ],
   },
   {
@@ -136,28 +150,28 @@ const products: Product[] = [
     type: ProductTypes.Autoinjector,
     imagePath: './assets/products/autoinjector.png',
     brands: [
-      { name: 'Simponi', imagePath: './assets/brands/Simponi.png' },
+      { name: 'simponi', imagePath: './assets/brands/autoinjector-1.PNG' },
     ],
   },
   {
     name: 'Spray',
     type: ProductTypes.Spray,
     imagePath: './assets/products/spray.png',
-    brands: [{ name: 'Spravato', imagePath: './assets/brands/Spravato.png' }],
+    brands: [{ name: 'spravato', imagePath: './assets/brands/spray-1.PNG' }],
   },
   {
     name: 'Tablet',
     type: ProductTypes.Tablet,
     imagePath: './assets/products/tablet.png',
     brands: [
-      { name: 'Symtuza', imagePath: './assets/brands/Symtuza.png' },
-      { name: 'Erleada', imagePath: './assets/brands/Erleada.png' },
-      { name: 'Opsynvi', imagePath: './assets/brands/Opsynvi.png' },
-      { name: 'Xarelto', imagePath: './assets/brands/Xarelto.png' },
-      { name: 'Balversa', imagePath: './assets/brands/Balversa.png' },
-      { name: 'RisperdalConsta', imagePath: './assets/brands/RisperdalConsta.png' },
-      { name: 'Imbruvica', imagePath: './assets/brands/Imbruvica.png' },
-      { name: 'Uptravi', imagePath: './assets/brands/Uptravi.png' },
+      { name: 'symtuza', imagePath: './assets/brands/tablet-1.PNG' },
+      { name: 'erleada', imagePath: './assets/brands/tablet-2.PNG' },
+      { name: 'opsynvi', imagePath: './assets/brands/tablet-3.PNG' },
+      { name: 'xarelto', imagePath: './assets/brands/tablet-4.PNG' },
+      { name: 'balversa', imagePath: './assets/brands/tablet-5.PNG' },
+      { name: 'risperdal', imagePath: './assets/brands/tablet-6.PNG' },
+      { name: 'imbruvica', imagePath: './assets/brands/tablet-7.PNG' },
+      { name: 'uptravi', imagePath: './assets/brands/tablet-8.PNG' },
     ],
   },
   {
@@ -165,15 +179,15 @@ const products: Product[] = [
     type: ProductTypes.Vial,
     imagePath: './assets/products/vial.png',
     brands: [
-      { name: 'Velcade', imagePath: './assets/brands/Velcade.png' },
-      { name: 'Remicade', imagePath: './assets/brands/Remicade.png' },
-      { name: 'Darzalex', imagePath: './assets/brands/Darzalex.png' },
-      { name: 'Simponi', imagePath: './assets/brands/Simponi.png' },
-      { name: 'Uptravi', imagePath: './assets/brands/Uptravi.png' },
-      { name: 'Ponvory', imagePath: './assets/brands/Ponvory.png' },
-      { name: 'Stelara', imagePath: './assets/brands/Stelara.png' },
-      { name: 'Tecvayli', imagePath: './assets/brands/Tecvayli.png' },
-      { name: 'Rybrevant', imagePath: './assets/brands/Rybrevant.png' },
+      { name: 'velcade', imagePath: './assets/brands/vial-1.PNG' },
+      { name: 'remicade', imagePath: './assets/brands/vial-2.PNG' },
+      { name: 'darzalex', imagePath: './assets/brands/vial-3.PNG' },
+      { name: 'simponi', imagePath: './assets/brands/vial-4.PNG' },
+      { name: 'uptravi', imagePath: './assets/brands/vial-5.PNG' },
+      { name: 'ponvory', imagePath: './assets/brands/vial-6.PNG' },
+      { name: 'sterala', imagePath: './assets/brands/vial-7.PNG' },
+      { name: 'tecvayli', imagePath: './assets/brands/vial-8.PNG' },
+      { name: 'rybrevant', imagePath: './assets/brands/vial-9.PNG' },
     ],
   },
   {
@@ -181,7 +195,7 @@ const products: Product[] = [
     type: ProductTypes.InjectionKit,
     imagePath: './assets/products/injectionkit.png',
     brands: [
-      { name: 'RisperdalConsta', imagePath: './assets/brands/RisperdalConsta.png' },
+      { name: 'risperdal', imagePath: './assets/brands/injectionKit-1.PNG' },
     ],
   },
   {
@@ -189,31 +203,31 @@ const products: Product[] = [
     type: ProductTypes.Cream,
     imagePath: './assets/products/cream.png',
     brands: [
-      { name: 'Daktarin', imagePath: './assets/brands/Daktarin.png' },
-      { name: 'Nizoral', imagePath: './assets/brands/Nizoral.png' },
-      { name: 'Daktacort', imagePath: './assets/brands/Daktacort.png' },
+      { name: 'daktarin', imagePath: './assets/brands/cream-1.PNG' },
+      { name: 'nizoral', imagePath: './assets/brands/cream-2.PNG' },
+      { name: 'daktacort', imagePath: './assets/brands/cream-3.PNG' },
     ],
   },
   {
     name: 'Patch',
     type: ProductTypes.Patch,
     imagePath: './assets/products/patch.png',
-    brands: [{ name: 'Evra', imagePath: './assets/brands/Evra.png' }],
+    brands: [{ name: 'evra', imagePath: './assets/brands/patch-1.PNG' }],
   },
   {
     name: 'Ampule',
     type: ProductTypes.Ampule,
     imagePath: './assets/products/ampule.png',
-    brands: [{ name: 'Daktarin', imagePath: './assets/brands/Daktarin.png' }],
+    brands: [{ name: 'daktarin', imagePath: './assets/brands/ampule-1.PNG' }],
   },
   {
     name: 'Other',
     type: ProductTypes.Other,
     imagePath: './assets/products/other.png',
     brands: [
-      { name: 'Carvykti', imagePath: './assets/brands/Carvykti.png' },
-      { name: 'Cabenuva', imagePath: './assets/brands/Cabenuva.png' },
-      { name: 'Akeega', imagePath: './assets/brands/Akeega.png' },
+      { name: 'carvykti', imagePath: './assets/brands/other-1.PNG' },
+      { name: 'cabenuva', imagePath: './assets/brands/other-2.PNG' },
+      { name: 'akeega', imagePath: './assets/brands/other-3.PNG' },
     ],
   },
   {
@@ -221,42 +235,42 @@ const products: Product[] = [
     type: ProductTypes.Unknown,
     imagePath: './assets/products/unknown.png',
     brands: [
-      { name: 'Tremfya', imagePath: './assets/brands/Tremfya.png' },
-      { name: 'Stelara', imagePath: './assets/brands/Stelara.png' },
-      { name: 'Invega', imagePath: './assets/brands/Invega.png' },
-      { name: 'Simponi', imagePath: './assets/brands/Simponi.png' },
-      { name: 'Spravato', imagePath: './assets/brands/Spravato.png' },
-      { name: 'Symtuza', imagePath: './assets/brands/Symtuza.png' },
-      { name: 'Erleada', imagePath: './assets/brands/Erleada.png' },
-      { name: 'Opsynvi', imagePath: './assets/brands/Opsynvi.png' },
-      { name: 'Xarelto', imagePath: './assets/brands/Xarelto.png' },
-      { name: 'Balversa', imagePath: './assets/brands/Balversa.png' },
-      { name: 'RisperdalConsta', imagePath: './assets/brands/RisperdalConsta.png' },
-      { name: 'Imbruvica', imagePath: './assets/brands/Imbruvica.png' },
-      { name: 'Uptravi', imagePath: './assets/brands/Uptravi.png' },
-      { name: 'Velcade', imagePath: './assets/brands/Velcade.png' },
-      { name: 'Remicade', imagePath: './assets/brands/Remicade.png' },
-      { name: 'Darzalex', imagePath: './assets/brands/Darzalex.png' },
-      { name: 'Ponvory', imagePath: './assets/brands/Ponvory.png' },
-      { name: 'Tecvayli', imagePath: './assets/brands/Tecvayli.png' },
-      { name: 'Rybrevant', imagePath: './assets/brands/Rybrevant.png' },
-      { name: 'Daktarin', imagePath: './assets/brands/Daktarin.png' },
-      { name: 'Nizoral', imagePath: './assets/brands/Nizoral.png' },
-      { name: 'Daktacort', imagePath: './assets/brands/Daktacort.png' },
-      { name: 'Evra', imagePath: './assets/brands/Evra.png' },
-      { name: 'Carvykti', imagePath: './assets/brands/Carvykti.png' },
-      { name: 'Cabenuva', imagePath: './assets/brands/Cabenuva.png' },
-      { name: 'Akeega', imagePath: './assets/brands/Akeega.png' },
+      { name: 'tremfya', imagePath: './assets/brands/onePressDevice-1.PNG' },
+      { name: 'stelara', imagePath: './assets/brands/prefilledSyringe-1.PNG' },
+      { name: 'hafyera', imagePath: './assets/brands/prefilledSyringe-3.PNG' },
+      { name: 'simponi', imagePath: './assets/brands/autoinjector-1.PNG' },
+      { name: 'spravato', imagePath: './assets/brands/spray-1.PNG' },
+      { name: 'symtuza', imagePath: './assets/brands/tablet-1.PNG' },
+      { name: 'erleada', imagePath: './assets/brands/tablet-2.PNG' },
+      { name: 'opsynvi', imagePath: './assets/brands/tablet-3.PNG' },
+      { name: 'xarelto', imagePath: './assets/brands/tablet-4.PNG' },
+      { name: 'balversa', imagePath: './assets/brands/tablet-5.PNG' },
+      { name: 'risperdal', imagePath: './assets/brands/tablet-6.PNG' },
+      { name: 'imbruvica', imagePath: './assets/brands/tablet-7.PNG' },
+      { name: 'uptravi', imagePath: './assets/brands/tablet-8.PNG' },
+      { name: 'velcade', imagePath: './assets/brands/vial-1.PNG' },
+      { name: 'remicade', imagePath: './assets/brands/vial-2.PNG' },
+      { name: 'darzalex', imagePath: './assets/brands/vial-3.PNG' },
+      { name: 'ponvory', imagePath: './assets/brands/vial-6.PNG' },
+      { name: 'tecvayli', imagePath: './assets/brands/vial-8.PNG' },
+      { name: 'rybrevant', imagePath: './assets/brands/vial-9.PNG' },
+      { name: 'daktarin', imagePath: './assets/brands/cream-1.PNG' },
+      { name: 'nizoral', imagePath: './assets/brands/cream-2.PNG' },
+      { name: 'daktacort', imagePath: './assets/brands/cream-3.PNG' },
+      { name: 'evra', imagePath: './assets/brands/patch-1.PNG' },
+      { name: 'carvykti', imagePath: './assets/brands/other-1.PNG' },
+      { name: 'cabenuva', imagePath: './assets/brands/other-2.PNG' },
+      { name: 'akeega', imagePath: './assets/brands/other-3.PNG' },
     ],
   },
 ];
 
 @Component({
-  selector: 'app-complaint-form',
-  templateUrl: './complaint-form.component.html',
-  styleUrls: ['./complaint-form.component.scss'],
+  selector: 'app-stepper',
+  templateUrl: './stepper.component.html',
+  styleUrls: ['./stepper.component.scss'],
 })
-export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit {
+export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
   readonly UserTypes = UserTypes;
   readonly ComplaintReportTypes = ComplaintReportTypes;
   readonly ProductTypes = ProductTypes;
@@ -290,7 +304,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
     FormGroupType<IComplaintDetails>
   >;
 
-  readonly stepperOrientation: Observable<StepperOrientation>;
   readonly stateGroupOptions$: Observable<StateGroup[]>;
 
   readonly stateGroups: StateGroup[] = [
@@ -394,8 +407,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
 
   @ViewChild(MatStepper) stepper!: MatStepper;
 
-  // totalSteps = this.stepper._steps.length;
-
   private readonly destroy$ = new Subject<void>();
   private readonly readyForMoreQuestions$ = new Subject<void>();
 
@@ -477,13 +488,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
     private readonly progressBarService: ProgressBarService,
     private readonly fb: FormBuilder,
     activedRoute: ActivatedRoute,
-    breakpointObserver: BreakpointObserver
   ) {
-    this.stepperOrientation = breakpointObserver
-      .observe('(min-width: 1000px)')
-      .pipe(map(({ matches }) => (matches ? 'horizontal' : 'horizontal')));
-
-    // this.progressBarService.setTotalSteps(this.stepper._steps.length);
 
     this.productFormGroup = fb.group<FormGroupType<IProductInformation>>({
       productQualityComplaint: fb.control<boolean | null>(null, {
@@ -618,7 +623,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
         nonNullable: true,
         validators: [],
       }),
-      // productImage: fb.control<string>("", { nonNullable: true, validators: [] }),
     });
 
     this.userDetailsFormGroup = fb.group<FormGroupType<IUserDetails>>({
@@ -687,7 +691,9 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
             nonNullable: true,
             validators: [Validators.required],
           }),
-          additionalContactInformation: fb.group<FormGroupType<IContactInformation>>({
+          additionalContactInformation: fb.group<
+            FormGroupType<IContactInformation>
+          >({
             addressLine1: fb.control<string>('', {
               nonNullable: true,
               validators: [Validators.required],
@@ -795,65 +801,16 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
             }),
           }),
         }),
-        // patientMedicalHistory: fb.group<FormGroupType<IPatientMedicalHistory>>({
-        //   medicalHistory: fb.control<string>('', {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   allergies: fb.control<AllergyStatus | null>(null, {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   allergyDetails: fb.control<string>('', {
-        //     nonNullable: true,
-        //     validators: [],
-        //   }),
-        //   drugAbuse: fb.control<DrugAbuseStatus | null>(null, {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   drugAbuseDetails: fb.control<string>('', {
-        //     nonNullable: true,
-        //     validators: [],
-        //   }),
-        //   alcoholConsumption: fb.control<AlcoholConsumptionStatus | null>(
-        //     null,
-        //     { nonNullable: true, validators: [Validators.required] }
-        //   ),
-        //   alcoholConsumptionDetails: fb.group<FormGroupType<Consumption>>({
-        //     value: fb.control<string | null>(null, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //     unit: fb.control<ConsumptionUnit | null>(ConsumptionUnit.Month, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //   }),
-        //   smokingStatus: fb.control<SmokingStatus | null>(null, {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   smokingDetails: fb.group<FormGroupType<Consumption>>({
-        //     value: fb.control<string | null>(null, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //     unit: fb.control<ConsumptionUnit | null>(ConsumptionUnit.Month, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //   }),
-        // }),
       }),
 
       patientReporterInformation: fb.group<
         FormGroupType<IPatientReporterInformation>
       >({
-        permissionToContactReporter: fb.control<ContactPermissionReporter | null>(null, {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
+        permissionToContactReporter:
+          fb.control<ContactPermissionReporter | null>(null, {
+            nonNullable: true,
+            validators: [Validators.required],
+          }),
         patient: fb.group<FormGroupType<IPatientDetails>>({
           title: fb.control<Title | null>(null, {
             nonNullable: true,
@@ -909,7 +866,9 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
             nonNullable: true,
             validators: [Validators.required],
           }),
-          additionalContactInformation: fb.group<FormGroupType<IContactInformation>>({
+          additionalContactInformation: fb.group<
+            FormGroupType<IContactInformation>
+          >({
             addressLine1: fb.control<string>('', {
               nonNullable: true,
               validators: [Validators.required],
@@ -1017,56 +976,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
           null,
           { nonNullable: true, validators: [Validators.required] }
         ),
-        // patientMedicalHistory: fb.group<FormGroupType<IPatientMedicalHistory>>({
-        //   medicalHistory: fb.control<string>('', {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   allergies: fb.control<AllergyStatus | null>(null, {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   allergyDetails: fb.control<string>('', {
-        //     nonNullable: true,
-        //     validators: [],
-        //   }),
-        //   drugAbuse: fb.control<DrugAbuseStatus | null>(null, {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   drugAbuseDetails: fb.control<string>('', {
-        //     nonNullable: true,
-        //     validators: [],
-        //   }),
-        //   alcoholConsumption: fb.control<AlcoholConsumptionStatus | null>(
-        //     null,
-        //     { nonNullable: true, validators: [Validators.required] }
-        //   ),
-        //   alcoholConsumptionDetails: fb.group<FormGroupType<Consumption>>({
-        //     value: fb.control<string | null>(null, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //     unit: fb.control<ConsumptionUnit | null>(ConsumptionUnit.Month, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //   }),
-        //   smokingStatus: fb.control<SmokingStatus | null>(null, {
-        //     nonNullable: true,
-        //     validators: [Validators.required],
-        //   }),
-        //   smokingDetails: fb.group<FormGroupType<Consumption>>({
-        //     value: fb.control<string | null>(null, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //     unit: fb.control<ConsumptionUnit | null>(ConsumptionUnit.Month, {
-        //       nonNullable: true,
-        //       validators: [],
-        //     }),
-        //   }),
-        // }),
       }),
     });
 
@@ -1439,9 +1348,9 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
       },
     ];
 
-    this.products.forEach(product => {
-      this.filteredBrands = product.name === 'Unknown' ? product.brands : []
-      this.sortBrands(product.brands)
+    this.products.forEach((product) => {
+      this.filteredBrands = product.name === 'Unknown' ? product.brands : [];
+      this.sortBrands(product.brands);
     });
   }
 
@@ -1454,107 +1363,80 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
   }
 
   ngOnInit() {
-    const patientContactInfo = this.userDetailsFormGroup.get('patientInformation.patient.contactInformation');
-    const patientReporterContactInfo = this.userDetailsFormGroup.get('patientReporterInformation.patient.contactInformation');
+    const patientContactInfo = this.userDetailsFormGroup.get(
+      'patientInformation.patient.contactInformation'
+    );
+    const patientReporterContactInfo = this.userDetailsFormGroup.get(
+      'patientReporterInformation.patient.contactInformation'
+    );
 
     if (this.complaintReportingFormGroup.controls.purchasedCountry) {
-      this.countriesList = this.complaintReportingFormGroup.controls.purchasedCountry.valueChanges.pipe(
-        startWith(''),
-        map(value => this._filter(value || ''))
-      )
+      this.countriesList =
+        this.complaintReportingFormGroup.controls.purchasedCountry.valueChanges.pipe(
+          startWith(''),
+          map((value) => this._filter(value || ''))
+        );
     } else if (patientContactInfo?.get('country')) {
-      this.countriesList = patientContactInfo?.get('country')?.valueChanges.pipe(
-        startWith(''),
-        map(value => this._filter(value || ''))
-      )
+      this.countriesList = patientContactInfo
+        ?.get('country')
+        ?.valueChanges.pipe(
+          startWith(''),
+          map((value) => this._filter(value || ''))
+        );
     } else if (patientReporterContactInfo?.get('country')) {
-      this.countriesList = patientReporterContactInfo?.get('country')?.valueChanges.pipe(
-        startWith(''),
-        map(value => this._filter(value || ''))
-      )
+      this.countriesList = patientReporterContactInfo
+        ?.get('country')
+        ?.valueChanges.pipe(
+          startWith(''),
+          map((value) => this._filter(value || ''))
+        );
     }
-
   }
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.countries.filter(country => country.toLowerCase().includes(filterValue));
+    return this.countries.filter((country) =>
+      country.toLowerCase().includes(filterValue)
+    );
   }
 
   ngAfterViewInit(): void {
-    this.complaintReportingFormGroup.controls.product.valueChanges.subscribe((product) => {
-      if (product) {
-        this.scrollToItemSection();
+    this.complaintReportingFormGroup.controls.product.valueChanges.subscribe(
+      (product) => {
+        if (product) {
+          this.scrollToItemSection();
+        }
       }
-    });
+    );
 
-    this.complaintReportingFormGroup.controls.brand.valueChanges.subscribe((brand) => {
-      if (brand) {
-        this.scrollToStrengthSection();
+    this.complaintReportingFormGroup.controls.brand.valueChanges.subscribe(
+      (brand) => {
+        if (brand) {
+          this.scrollToStrengthSection();
+        }
       }
-    });
+    );
   }
 
   filterbrands(filter: string, productName: string) {
-    const productList = this.products.find(product => product.name == productName);
+    const productList = this.products.find(
+      (product) => product.name == productName
+    );
 
     if (productList) {
       if (productName === 'Unknown') {
-        this.filteredBrands = productList.brands.filter(brand =>
-          filter ?
-          brand.name.charAt(0).toUpperCase() >= filter.charAt(0).toUpperCase() &&
-          brand.name.charAt(0).toUpperCase() <= filter.charAt(2).toUpperCase()
-          : true)
+        this.filteredBrands = productList.brands.filter((brand) =>
+          filter
+            ? brand.name.charAt(0).toUpperCase() >=
+                filter.charAt(0).toUpperCase() &&
+              brand.name.charAt(0).toUpperCase() <=
+                filter.charAt(2).toUpperCase()
+            : true
+        );
       } else {
         this.filteredBrands = productList.brands;
       }
-
-      // switch(filter) {
-      //   case 'A-C':
-      //     this.filteredProducts = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='A' && brand.name.charAt(0).toUpperCase() <= 'C'
-      //     )
-      //     break;
-      //   case 'D-F':
-      //     this.filteredBrands = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='D' && brand.name.charAt(0).toUpperCase() <= 'F'
-      //     )
-      //     break;
-      //   case 'G-I':
-      //     this.filteredBrands = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='G' && brand.name.charAt(0).toUpperCase() <= 'I'
-      //     )
-      //     break;
-      //   case 'J-L':
-      //     this.filteredBrands = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='J' && brand.name.charAt(0).toUpperCase() <= 'L'
-      //     )
-      //     break;
-      //   case 'M-O':
-      //     this.filteredBrands = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='M' && brand.name.charAt(0).toUpperCase() <= 'O'
-      //     )
-      //     break;
-      //   case 'P-R':
-      //     this.filteredBrands = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='P' && brand.name.charAt(0).toUpperCase() <= 'R'
-      //     )
-      //     break;
-      //   case 'S-U':
-      //     this.filteredBrands = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='S' && brand.name.charAt(0).toUpperCase() <= 'U'
-      //     )
-      //     break;
-      //   case 'V-Z':
-      //     this.filteredBrands = product.brands.filter(brand =>
-      //       brand.name.charAt(0).toUpperCase() >='V' && brand.name.charAt(0).toUpperCase() <= 'Z'
-      //     )
-      //     break;
-      //   default:
-      //     this.filteredBrands = [...product.brands]
-      //     break;
-      // }
     }
     this.sortBrands(this.filteredBrands);
     this.selectedBrand = filter;
@@ -1569,44 +1451,56 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
   }
 
   private scrollToStrengthSection(): void {
-
     setTimeout(() => {
       if (!this.strengthSection) {
-        return
+        return;
       }
       this.strengthSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
     }, 100);
-
   }
 
-  // get concomitantProductDetails(): FormArray {
-  //   return this.complaintDetailsFormGroup.get('product.concomitantMedication.details') as FormArray;
-  // }
-
   onPatientRadioChange(value: boolean) {
-    const patientContactInfo = this.userDetailsFormGroup.get('patientInformation.patient.contactInformation');
-    const contactFields = ['addressLine1', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
+    const patientContactInfo = this.userDetailsFormGroup.get(
+      'patientInformation.patient.contactInformation'
+    );
+    const contactFields = [
+      'addressLine1',
+      'city',
+      'postalCode',
+      'state',
+      'telephone',
+      'emailAddress',
+    ];
 
-    contactFields.forEach(contact => {
+    contactFields.forEach((contact) => {
       const control = patientContactInfo?.get(contact);
       if (control) {
         control.setValidators(value ? [Validators.required] : []);
         control.updateValueAndValidity();
       }
-    })
+    });
   }
 
   onNonPatientReporterRadioChange(value: boolean) {
-    const patientReporterContactInfo = this.userDetailsFormGroup.get('patientReporterInformation.patient.contactInformation');
-    const contactFields = ['addressLine1', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
+    const patientReporterContactInfo = this.userDetailsFormGroup.get(
+      'patientReporterInformation.patient.contactInformation'
+    );
+    const contactFields = [
+      'addressLine1',
+      'city',
+      'postalCode',
+      'state',
+      'telephone',
+      'emailAddress',
+    ];
 
-    contactFields.forEach(contact => {
+    contactFields.forEach((contact) => {
       const control = patientReporterContactInfo?.get(contact);
       if (control) {
         control.setValidators(value ? [Validators.required] : []);
         control.updateValueAndValidity();
       }
-    })
+    });
   }
 
   get formControls(): { label: string; value: string }[] {
@@ -1638,7 +1532,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
   }
 
   private formatObjectValue(obj: any): string {
-    const properties = Object.keys(obj).map(prop => `${prop}: ${obj[prop]}`);
+    const properties = Object.keys(obj).map((prop) => `${prop}: ${obj[prop]}`);
     return properties.join(', ');
   }
 
@@ -1689,7 +1583,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
         validators: [Validators.required],
       }),
     };
-    // this.complaintDetailsFormGroup.
   }
 
   addConcomitantProduct() {
@@ -1724,9 +1617,12 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
 
   onBrandSelectionChange(brandName: string): void {
     this.selectedBrandControl.setValue(brandName);
-    // this.scrollToStrengthSection();
-    this.filteredProducts = this.products.filter(product => product.brands.some(brand => brand.name.toLowerCase() === brandName) && product.name !== 'Unknown' )
-    console.log(this.filteredProducts)
+    this.filteredProducts = this.products.filter(
+      (product) =>
+        product.brands.some(
+          (brand) => brand.name.toLowerCase() === brandName
+        ) && product.name !== 'Unknown'
+    );
   }
 
   private _filterGroup(value: string): StateGroup[] {
@@ -1748,17 +1644,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
 
   ngOnDestroy() {
     this.destroy$.next();
-  }
-
-  nextStep() {
-    // const selectedReportType =
-    //   this.complaintReportingFormGroup.controls.complaintReportType.value;
-    // if (selectedReportType?.includes(this.ComplaintReportTypes.AdverseEvent)) {
-    //   this.showMedicalHistory = true;
-    // } else {
-    //   this.showMedicalHistory = false;
-    // }
-    // this.stepper.next();
   }
 
   resetProblemDetails() {
@@ -1814,5 +1699,9 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
 
   private getNextQuestions() {
     this.readyForMoreQuestions$.next();
+  }
+  complaintDetails?: any;
+  handleDataChanged(data: any) {
+    this.complaintDetails = { ...this.complaintDetails };
   }
 }

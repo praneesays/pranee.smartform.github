@@ -1,0 +1,87 @@
+<div class="stepper h-100">
+  <mat-stepper
+    (selectionChange)="onStepSelectionChange($event)"
+    class="flex-grow-1 w-100 h-100"
+    linear="false"
+    #stepper
+  >
+    <mat-step
+      [stepControl]="complaintReportingFormGroup"
+      [editable]="!complaintSubmitted"
+      [completed]="complaintSubmitted"
+      class="w-75 h-100" label="Preliminary Information"
+    >
+      <app-complaint-reporting [products]="products" (dataChanged)="handleDataChanged($event)"></app-complaint-reporting>
+    </mat-step>
+    <mat-step
+      [stepControl]="userDetailsFormGroup"
+      [editable]="!complaintSubmitted"
+      [completed]="complaintSubmitted"
+      class="w-75 h-100" label="User Details"
+    >
+      <app-user-details [complaintReportingFormGroup]="complaintDetails"></app-user-details>
+    </mat-step>
+    <mat-step
+      [editable]="!complaintSubmitted"
+      [completed]="complaintSubmitted"
+      class="w-75 h-100"
+    >
+      <ng-template matStepLabel>Review</ng-template>
+      <div class="w-100 h-100 d-flex flex-column gap-2">
+        <div
+          *ngIf="!complaintSubmitted"
+          class="h-100 d-flex flex-column align-items-center gap-2"
+        >
+          <div
+            class="flex-grow-1 bg-white rounded-3 shadow px-3 px-sm-5 py-3 d-flex flex-column align-items-center mb-2"
+          >
+            <div class="w-100">
+              <h2 class="text-center">REVIEW</h2>
+              <div class="w-75 border rounded-3 px-5 py-3 me-auto ms-auto">
+                <h3 class="fw-semibold">Preliminary Information</h3>
+                <div class="row" *ngFor="let control of formControls">
+                  <div class="col-sm-12 col-lg-6">{{ control.label }}</div>
+                  <div class="col-sm-12 col-lg-6">{{ control.value }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center privacy-text mt-3 w-50">
+              JnJ will handle this adverse event, contact information, and
+              personal information provided in accordance with its Privacy
+              Policy. You can view Janssen's Privacy Policy by clicking on the
+              link <a href="#"> Janssen's Privacy Policy</a>
+            </div>
+            <mat-checkbox
+              class="example-margin"
+              color="primary"
+              [(ngModel)]="privacyPolicyChecked"
+              >I acknowledge Janssen's Privacy Policy</mat-checkbox
+            >
+          </div>
+
+          <div class="mt-4 d-flex justify-content-center w-100 gap-5">
+            <button mat-stroked-button color="secondary" matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon> Back
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              class="primary-btn"
+              (click)="submitComplaint()"
+              [disabled]="!privacyPolicyChecked"
+            >
+              Submit <mat-icon iconPositionEnd>done</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div
+          *ngIf="complaintSubmitted"
+          class="d-flex flex-column align-items-center text-align-center mt-4"
+        >
+          <h3><strong>Thanks for submitting your case!</strong></h3>
+          <p>We will contact you if any additional information is required.</p>
+        </div>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</div>
