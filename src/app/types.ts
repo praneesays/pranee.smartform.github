@@ -237,11 +237,11 @@ export interface IPersonalInformation {
 }
 
 export enum UserTypes {
-  Patient = 'patient',
-  HealthcareProfessional = 'healthcareProfessional',
-  NonHealthcareProfessional = 'nonHealthcareProfessional',
-  Manufacturer = 'manufacturer',
-  Employees = 'employees',
+  Patient = 'Patient',
+  HealthcareProfessional = 'Healthcare Professional',
+  NonHealthcareProfessional = 'Non-Healthcare Professional(Parent/Relative/Friend/Guardian)',
+  Manufacturer = 'Manufacturer',
+  Employees = 'Employees',
 }
 
 export enum ComplaintReportTypes {

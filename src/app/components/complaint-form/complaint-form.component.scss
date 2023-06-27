@@ -181,14 +181,7 @@ mat-expansion-panel-header.invalid {
   }
 }
 
-@media (max-width: 576px) {
-  .checkbox-container {
-    mat-button-toggle-group {
-      flex-direction: column;
-      align-items: center;
-    }
-  }
-}
+
 
 .vertical-tabs-section {
   .vertical-tabs {
@@ -243,7 +236,8 @@ mat-expansion-panel-header.invalid {
   }
 
   [type="radio"] + .product-section {
-    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+      rgba(17, 17, 26, 0.1) 0px 0px 8px;
     cursor: pointer;
     transition: transform 0.5s;
     &:hover {
@@ -255,6 +249,9 @@ mat-expansion-panel-header.invalid {
       /* border-radius: 0.5rem; */
       border-top-left-radius: 0.5rem;
       border-top-right-radius: 0.5rem;
+      width: 150px;
+      height: 150px;
+      margin: 2px;
     }
 
     .image-caption {
@@ -288,6 +285,28 @@ mat-expansion-panel-header.invalid {
   // }
 }
 
+@media (max-width: 576px) {
+  .checkbox-container {
+    mat-button-toggle-group {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  .vertical-tabs-section {
+    [type="radio"] + .product-section {
+      
+      .image-section {
+        width: 120px;
+        height: 120px;
+      }
+  
+      .image-caption {
+       
+      }
+    }
+  }
+}
 
 .brands_section {
   .filter-section {

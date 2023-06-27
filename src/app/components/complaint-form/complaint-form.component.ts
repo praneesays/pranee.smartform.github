@@ -399,6 +399,8 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
   private readonly destroy$ = new Subject<void>();
   private readonly readyForMoreQuestions$ = new Subject<void>();
 
+
+  userTypeValues: string[] = Object.values(UserTypes);
   titleOptions: string[] = Object.values(Title);
   countries: Country[] = Object.values(Country);
   genderOptions: string[] = Object.values(Gender);
@@ -578,7 +580,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
       }),
       batchLotNumber: fb.control<string>('', {
         nonNullable: true,
-        validators: [Validators.required],
+        validators: [],
       }),
       noReason: fb.control<string>('', {
         nonNullable: true,
@@ -1473,7 +1475,6 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
         map(value => this._filter(value || ''))
       )
     }
-
   }
 
   private _filter(value: string): string[] {
@@ -1596,6 +1597,30 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
     })
   }
 
+  handleBatchLotNumberChange(value: boolean) {
+    const batchLotNumber = this.complaintReportingFormGroup.get('batchLotNumber') ;
+    const noReason = this.complaintReportingFormGroup?.get('noReason');
+
+    if (!batchLotNumber) {
+      return
+    }
+
+    if (!noReason) {
+      return
+    }
+    
+    if (value) {
+        this.clearValidatorsAndSetValue(noReason);        
+        this.setRequiredValidator(batchLotNumber);
+    } else {
+      this.clearValidatorsAndSetValue(batchLotNumber);
+      this.setRequiredValidator(noReason);
+    }
+
+    this.updateFormControlValidity(batchLotNumber);
+    this.updateFormControlValidity(noReason);
+  }
+
   onNonPatientReporterRadioChange(value: boolean) {
     const patientReporterContactInfo = this.userDetailsFormGroup.get('patientReporterInformation.patient.contactInformation');
     const contactFields = ['addressLine1', 'city', 'postalCode', 'state', 'telephone', 'emailAddress'];
@@ -1607,6 +1632,58 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
         control.updateValueAndValidity();
       }
     })
+  }
+
+  setRequiredValidator(control: AbstractControl) {
+    control?.setValidators(Validators.required);
+  }
+
+  clearValidatorsAndSetValue(control: AbstractControl) {
+    control?.setValue('');
+    control?.clearValidators();
+  }
+
+  updateFormControlValidity(control: AbstractControl) {
+    control?.updateValueAndValidity();
+  }
+
+  private initializeHcpFormGroup() {
+    const reportedFromJNJProgramControl = this.hcpFormGroup.get('reportedFromJNJProgram');
+    const studyProgramControl = this.hcpFormGroup.get('studyProgram');
+    const siteNumberControl = this.hcpFormGroup.get('siteNumber');
+    const subjectNumberControl = this.hcpFormGroup.get('subjectNumber');
+
+    reportedFromJNJProgramControl?.setValidators([Validators.required]);
+
+    reportedFromJNJProgramControl?.valueChanges.subscribe(value => {
+      if (value) {
+        studyProgramControl?.setValidators([Validators.required]);
+        siteNumberControl?.setValidators([Validators.required]);
+        subjectNumberControl?.setValidators([Validators.required]);
+      } else {
+        studyProgramControl?.updateValueAndValidity();
+        siteNumberControl?.updateValueAndValidity();
+        subjectNumberControl?.updateValueAndValidity();
+      }
+    })
+    reportedFromJNJProgramControl?.updateValueAndValidity();    
+  }
+
+  private clearHcpFormGroup() {
+    this.hcpFormGroup.clearValidators();
+  }
+
+  onUserTypeChange(value: string) {
+    if (value === UserTypes.HealthcareProfessional) {
+      this.initializeHcpFormGroup();
+    } else {
+      this.clearHcpFormGroup();
+    }
+    this.hcpFormGroup.updateValueAndValidity();
+  }
+
+  get hcpFormGroup() {
+    return this.complaintReportingFormGroup.get('hcp') as FormGroup;
   }
 
   get formControls(): { label: string; value: string }[] {
@@ -1725,8 +1802,7 @@ export class ComplaintFormComponent implements OnDestroy, OnInit, AfterViewInit 
   onBrandSelectionChange(brandName: string): void {
     this.selectedBrandControl.setValue(brandName);
     // this.scrollToStrengthSection();
-    this.filteredProducts = this.products.filter(product => product.brands.some(brand => brand.name.toLowerCase() === brandName) && product.name !== 'Unknown' )
-    console.log(this.filteredProducts)
+    this.filteredProducts = this.products.filter(product => product.brands.some(brand => brand.name.toLowerCase() === brandName.toLowerCase()) && product.name !== 'Unknown' )
   }
 
   private _filterGroup(value: string): StateGroup[] {

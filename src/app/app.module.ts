@@ -28,6 +28,7 @@ import { StepperComponent } from './components/stepper/stepper.component';
 import { UserDetailsComponent } from './components/stepper/user-details/user-details.component';
 import { ComplaintReportingComponent } from './components/stepper/complaint-reporting/complaint-reporting.component';
 import { ReviewComponent } from './components/stepper/review/review.component';
+import { ImageSelectorComponent } from './components/image-selector/image-selector.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { ReviewComponent } from './components/stepper/review/review.component';
     UserDetailsComponent,
     ComplaintReportingComponent,
     ReviewComponent,
+    ImageSelectorComponent,
   ],
   imports: [
     BrowserModule,
