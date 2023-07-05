@@ -1,493 +1,324 @@
-<form [formGroup]="complaintReportingFormGroup"
-  class="w-100 h-100 d-flex flex-column gap-2"
->
-  <ng-template matStepLabel>Preliminary Information</ng-template>
+<form [formGroup]="form" class="w-100 h-100 d-flex flex-column gap-2">
+    <ng-template matStepLabel>Preliminary Information</ng-template>
 
-  <div class="flex-grow-1 bg-white rounded-3 shadow px-3 px-sm-5 py-3">
-    <div>
-      <h2>What best describes you?</h2>
-      <mat-chip-listbox
-        aria-label="User role selection"
-        formControlName="userType"
-      >
-        <mat-chip-option [value]="UserTypes.Patient">Patient</mat-chip-option>
-        <mat-chip-option [value]="UserTypes.HealthcareProfessional"
-          >Healthcare Professional</mat-chip-option
-        >
-        <mat-chip-option [value]="UserTypes.NonHealthcareProfessional"
-          >Non-Healthcare Professional
-          (Parent/Relative/Friend/Guardian)</mat-chip-option
-        >
-        <mat-chip-option [value]="UserTypes.Manufacturer"
-          >Manufacturer</mat-chip-option
-        >
-        <mat-chip-option [value]="UserTypes.Employees"
-          >Employees</mat-chip-option
-        >
-      </mat-chip-listbox>
-    </div>
-
-    <div
-      *ngIf="!complaintReportingFormGroup.controls.userType.value"
-      class="d-flex align-items-center justify-content-center p-2 border rounded-3 min-height-300 empty-selection"
-    >
-      <h2>There has been no selection of role.</h2>
-    </div>
-
-    <ng-container *ngIf="complaintReportingFormGroup.controls.userType.value">
-      <div class="mt-3">
-        <mat-form-field class="default-control-width" appearance="outline">
-          <mat-label>Which country the product was purchased in?</mat-label>
-          <input
-            type="text"
-            placeholder="Which country the product was purchased in?"
-            aria-label="Country"
-            matInput
-            formControlName="purchasedCountry"
-            [matAutocomplete]="auto"
-          />
-
-          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-            <mat-option
-              *ngFor="let country of countriesList | async"
-              [value]="country"
-            >
-              {{ country }}
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </div>
-
-      <div class="products_section vertical-tabs-section">
-        <h2 class="mb-1">Report an event for the following product</h2>
-        <p class="mb-3 lh-base">
-          Please note that the product pictures displayed are for illustrative
-          purposes only. The color and appearance of the actual product may
-          differ in your location.
-        </p>
-
-        <div class="d-flex flex-wrap gap-4 mx-0 mx-md-2 my-2 align-items-end">
-          <ng-container *ngFor="let product of products; let i = index">
-            <label *ngIf="showAllProducts || selectedProductIndex === i">
-              <input
-                type="radio"
-                name="product"
-                [value]="product.name"
-                formControlName="product"
-                (change)="onProductSelectionChange(i)"
-                class="mb-2"
-              />
-              <div
-                class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
-              >
-                <div class="image-section">
-                  <img
-                    [ngSrc]="product.imagePath"
-                    width="150"
-                    height="150"
-                    [alt]="product.name"
-                  />
-                </div>
-                <div class="image-caption fw-semibold w-100 py-2 text-center">
-                  {{ product.name }}
-                </div>
-              </div>
-            </label>
-          </ng-container>
-          <button
-            mat-stroked-button
-            color="secondary"
-            (click)="toggleProducts()"
-            *ngIf="complaintReportingFormGroup.controls.product.value"
-          >
-            {{ showAllProducts ? "Hide other Products" : "Show all Products" }}
-          </button>
-        </div>
-      </div>
-
-      <div class="brands_section" #brandsSection>
-        <div
-          class="vertical-tabs-section my-3"
-          *ngIf="complaintReportingFormGroup.controls.product.value"
-        >
-          <h2 class="mb-1">Select a brand below</h2>
-          <ng-container *ngFor="let product of products">
-            <div
-              class="d-flex flex-column mx-0 mx-md-2 my-2"
-              *ngIf="
-                complaintReportingFormGroup.controls.product.value ===
-                product.name
-              "
-            >
-              <div
-                class="filter-section d-flex flex-column mb-3 gap-3"
-                *ngIf="
-                  complaintReportingFormGroup.controls.product.value ===
-                  'Unknown'
-                "
-              >
-                <div class="d-flex align-items-center gap-3">
-                  <h3
-                    class="fw-semibold mb-0 lh-base fs-6 text-secondary-emphasis"
-                  >
-                    Filter:
-                  </h3>
-                  <div class="d-flex gap-2">
-                    <button
-                      *ngFor="
-                        let letter of [
-                          'A-C',
-                          'D-F',
-                          'G-I',
-                          'J-L',
-                          'M-O',
-                          'P-R',
-                          'S-U',
-                          'V-Z'
-                        ]
-                      "
-                      mat-stroked-button
-                      color="secondary"
-                      (click)="filterbrands(letter, product.name)"
-                      [class.active]="selectedBrand === letter"
-                    >
-                      {{ letter }}
-                    </button>
-                  </div>
-                </div>
-
-                <div class="d-flex flex-wrap gap-4">
-                  <ng-container
-                    *ngIf="filteredBrands.length > 0; else noBrands"
-                  >
-                    <label *ngFor="let brand of filteredBrands">
-                      <input
-                        type="radio"
-                        name="brand"
-                        [value]="brand.name"
-                        formControlName="brand"
-                        (change)="onBrandSelectionChange(brand.name)"
-                        class="mb-2"
-                      />
-                      <div
-                        class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
-                      >
-                        <img
-                          [ngSrc]="brand.imagePath"
-                          width="150"
-                          height="150"
-                          [alt]="brand.name"
-                        />
-                      </div>
-                    </label>
-                  </ng-container>
-                  <ng-template #noBrands>
-                    <h3 class="fw-normal mb-0">
-                      No brands associated with this filter.
-                    </h3>
-                  </ng-template>
-                </div>
-              </div>
-              <div class="d-flex flex-wrap gap-4">
-                <ng-container
-                  *ngIf="
-                    complaintReportingFormGroup.controls.product.value !==
-                    'Unknown'
-                  "
-                >
-                  <label *ngFor="let brand of product.brands">
-                    <input
-                      type="radio"
-                      name="brand"
-                      [value]="brand.name"
-                      formControlName="brand"
-                      (change)="onBrandSelectionChange(brand.name)"
-                      class="mb-2"
-                    />
-                    <div
-                      class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
-                    >
-                      <img
-                        [ngSrc]="brand.imagePath"
-                        width="150"
-                        height="150"
-                        [alt]="brand.name"
-                      />
-                    </div>
-                  </label>
-                </ng-container>
-              </div>
-            </div>
-          </ng-container>
-        </div>
-      </div>
-    </ng-container>
-
-    <div
-      class="products_section vertical-tabs-section"
-      *ngIf="
-        complaintReportingFormGroup.controls.product.value === 'Unknown' &&
-        complaintReportingFormGroup.controls.brand.value
-      "
-      #strengthSection
-    >
-      <h2 class="mb-1">Select a Product below</h2>
-      <div class="d-flex flex-wrap gap-4 mx-0 mx-md-2 my-2 align-items-end">
-        <ng-container *ngFor="let product of filteredProducts; let i = index">
-          <label>
-            <input
-              type="radio"
-              name="product"
-              [value]="product.name"
-              formControlName="product"
-              (change)="onProductSelectionChange(i)"
-              class="mb-2"
-            />
-            <div
-              class="product-section d-flex flex-column align-items-center justify-content-center rounded-3"
-            >
-              <div class="image-section">
-                <img
-                  [ngSrc]="product.imagePath"
-                  width="150"
-                  height="150"
-                  [alt]="product.name"
-                />
-              </div>
-              <div class="image-caption fw-semibold w-100 py-2 text-center">
-                {{ product.name }}
-              </div>
-            </div>
-          </label>
-        </ng-container>
-      </div>
-    </div>
-
-    <div
-      class="my-3"
-      *ngIf="complaintReportingFormGroup.controls.brand.value"
-      #strengthSection
-    >
-      <div class="mt-3">
-        <mat-form-field class="default-control-width" appearance="outline">
-          <mat-label
-            >Please select a strength for which you want to report an
-            event?</mat-label
-          >
-          <mat-select formControlName="strength">
-            <mat-option value="50.00 MG">50.00 MG</mat-option>
-            <mat-option value="5 doses of 0.50 mL"
-              >5 doses of 0.50 mL</mat-option
-            >
-            <mat-option value="100.00 MG">100.00 MG</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="mb-0">
-        <mat-form-field class="default-control-width" appearance="outline">
-          <mat-label
-            >Can you return the product back to us (Field product return
-            pre-paid kit will be provided)</mat-label
-          >
-
-          <mat-select formControlName="returnOption">
-            <mat-option
-              *ngFor="let option of returnOptionValues"
-              [value]="option"
-              >{{ option }}</mat-option
-            >
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="mb-2">
-        <div class="d-flex align-items-center">
-          <label>Do you know the Batch/Lot Number</label>
-          <button
-            mat-icon-button
-            matSuffix
-            (click)="showLotNumberHelp()"
-            [attr.aria-label]="'Help finding this'"
-            style="width: 30px; height: 30px; padding: 0 10px"
-          >
-            <mat-icon>help</mat-icon>
-          </button>
-        </div>
-        <mat-radio-group
-          aria-label="Do you know the Batch or Lot Number"
-          color="primary"
-          formControlName="hasBatchLotNumber"
-        >
-          <mat-radio-button [value]="true" class="me-2">Yes</mat-radio-button>
-          <mat-radio-button [value]="false">No</mat-radio-button>
-        </mat-radio-group>
-      </div>
-
-      <div
-        *ngIf="
-          complaintReportingFormGroup.controls.hasBatchLotNumber.value &&
-          complaintReportingFormGroup.controls.hasBatchLotNumber.value === true
-        "
-        class="mt-3"
-      >
-        <mat-form-field class="default-control-width" appearance="outline">
-          <mat-label>Please enter Batch/Lot Number</mat-label>
-          <input
-            matInput
-            placeholder="Please enter Batch/Lot Number"
-            formControlName="batchLotNumber"
-          />
-        </mat-form-field>
-      </div>
-
-      <div
-        *ngIf="
-          !complaintReportingFormGroup.controls.hasBatchLotNumber.value &&
-          complaintReportingFormGroup.controls.hasBatchLotNumber.value == false
-        "
-      >
-        <div class="mt-3">
-          <mat-form-field class="default-control-width" appearance="outline">
-            <mat-label>Reason for not providing the batch/lot number</mat-label>
-            <input
-              matInput
-              placeholder="Reason for not providing the batch/lot number"
-              formControlName="noReason"
-            />
-          </mat-form-field>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12 col-lg-6">
-          <mat-form-field
-            class="default-control-width mb-2"
-            appearance="outline"
-          >
-            <mat-label>GTIN #</mat-label>
-            <input matInput placeholder="GTIN #" formControlName="gtin" />
-          </mat-form-field>
-        </div>
-
-        <div class="col-sm-12 col-lg-6">
-          <mat-form-field
-            class="default-control-width mb-2"
-            appearance="outline"
-          >
-            <mat-label>Serial #</mat-label>
-            <input matInput placeholder="Serial #" formControlName="serial" />
-          </mat-form-field>
-        </div>
-      </div>
-
-      <div
-        formGroupName="hcp"
-        class="mt-1"
-        *ngIf="
-          complaintReportingFormGroup.controls.userType.value ===
-          UserTypes.HealthcareProfessional
-        "
-      >
+    <div class="flex-grow-1 bg-white rounded-3 shadow px-3 px-sm-5 py-3">
         <div>
-          <mat-form-field class="default-control-width" appearance="outline">
-            <mat-label
-              >Was this complaint reported from a J&J program?</mat-label
-            >
-            <mat-select formControlName="reportedFromJNJProgram">
-              <mat-option [value]="true" class="me-2">Yes</mat-option>
-              <mat-option [value]="false">No</mat-option>
-            </mat-select>
-          </mat-form-field>
+            <h2>What best describes you?</h2>
+            <mat-chip-listbox aria-label="User role selection" formControlName="userType">
+                <ng-container *ngFor="let userType of userTypeValues">
+                    <mat-chip-option [value]="userType" (selectionChange)="onUserTypeChange(userType)">{{ userType }}</mat-chip-option>
+                </ng-container>
+            </mat-chip-listbox>
         </div>
+
         <div
-          class="row"
-          *ngIf="
-            complaintReportingFormGroup.get('hcp.reportedFromJNJProgram')
-              ?.value === true
-          "
+            *ngIf="!form.controls?.['userType']?.value"
+            class="d-flex align-items-center justify-content-center p-2 border rounded-3 min-height-300 empty-selection"
         >
-          <div class="col-sm-12 col-lg-4">
-            <mat-form-field class="default-control-width" appearance="outline">
-              <mat-label>Study Program</mat-label>
-              <input
-                matInput
-                placeholder="Study Program"
-                formControlName="studyProgram"
-              />
-            </mat-form-field>
-          </div>
-          <div class="col-sm-12 col-lg-4">
-            <mat-form-field class="default-control-width" appearance="outline">
-              <mat-label>Site Number</mat-label>
-              <input
-                matInput
-                placeholder="Site Number"
-                formControlName="siteNumber"
-              />
-            </mat-form-field>
-          </div>
-          <div class="col-sm-12 col-lg-4">
-            <mat-form-field class="default-control-width" appearance="outline">
-              <mat-label>Subject Number</mat-label>
-              <input
-                matInput
-                placeholder="Subject Number"
-                formControlName="subjectNumber"
-              />
-            </mat-form-field>
-          </div>
+            <h2>There has been no selection of role.</h2>
         </div>
-      </div>
 
-      <div class="mt-1">
-        <p class="lh-base">
-          Which part of the product you want to report the complaint for?
-        </p>
+        <ng-container *ngIf="form.controls?.['userType']?.value">
+            <div class="mt-3">
+                <mat-form-field class="default-control-width" appearance="outline">
+                    <mat-label>Which country the product was purchased in?</mat-label>
+                    <input
+                        type="text"
+                        placeholder="Which country the product was purchased in?"
+                        aria-label="Country"
+                        matInput
+                        formControlName="purchasedCountry"
+                        [matAutocomplete]="auto"
+                    />
 
-        <div *ngFor="let question of imageHotspotValues">
-          <ng-container *ngIf="question.type === 'image-map'">
-            <label *ngIf="question.questionText">{{
-              question.questionText
-            }}</label>
-            <app-image-map
-              [imageSrc]="question.imageUrl"
-              [areas]="question.areas"
-            ></app-image-map>
-          </ng-container>
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                        <mat-option *ngFor="let country of countriesList | async" [value]="country">
+                            {{ country }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+
+            <div class="products_section vertical-tabs-section">
+                <h2 class="mb-1">Report an event for the following product</h2>
+                <p class="mb-3 lh-base">
+                    Please note that the product pictures displayed are for illustrative purposes only. The color and appearance of the actual product
+                    may differ in your location.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2 gap-md-4 justify-content-between justify-content-md-start mx-2 my-2 align-items-end">
+                    <ng-container *ngFor="let product of products; let i = index">
+                        <label *ngIf="showAllProducts || selectedProductIndex === i" class="mb-2 mb-md-0">
+                            <input
+                                type="radio"
+                                name="product"
+                                [value]="product.name"
+                                formControlName="product"
+                                (change)="onProductSelectionChange(i)"
+                                class="mb-2"
+                            />
+                            <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                                <div class="image-section">
+                                    <img class="position-relative" [ngSrc]="product.imagePath" fill [alt]="product.name" />
+                                </div>
+                                <div class="image-caption fw-semibold w-100 py-2 text-center">
+                                    {{ product.name }}
+                                </div>
+                            </div>
+                        </label>
+                    </ng-container>
+                    <button mat-stroked-button color="secondary" (click)="toggleProducts()" *ngIf="form.controls?.['product']?.value">
+                        {{ showAllProducts ? "Hide other Products" : "Show all Products" }}
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="form.controls?.['product']?.value">
+            <div class="brands_section" #brandsSection>
+                <div class="vertical-tabs-section my-3">
+                    <h2 class="mb-1">Select a brand below</h2>
+                    <ng-container *ngFor="let product of products">
+                        <div class="d-flex flex-column mx-0 mx-md-2 my-2" *ngIf="form.controls?.['product']?.value === product.name">
+                            <div class="filter-section d-flex flex-column gap-3" *ngIf="form.controls?.['product']?.value === 'Unknown'">
+                                <div class="d-flex align-items-center gap-3">
+                                    <h3 class="fw-semibold mb-0 lh-base fs-6 text-secondary-emphasis">Filter:</h3>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button
+                                            *ngFor="let letter of ['A-C', 'D-F', 'G-I', 'J-L', 'M-O', 'P-R', 'S-U', 'V-Z']"
+                                            mat-stroked-button
+                                            color="secondary"
+                                            (click)="filterbrands(letter, product.name)"
+                                            [class.active]="selectedBrand === letter"
+                                        >
+                                            {{ letter }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="d-flex flex-wrap gap-2 gap-md-4 justify-content-between justify-content-md-start mx-2 my-2 align-items-end"
+                                >
+                                    <ng-container *ngIf="filteredBrands.length > 0; else noBrands">
+                                        <label *ngFor="let brand of filteredBrands" class="mb-2 mb-md-0">
+                                            <input
+                                                type="radio"
+                                                name="brand"
+                                                [value]="brand.name"
+                                                formControlName="brand"
+                                                (change)="onBrandSelectionChange(brand.name)"
+                                                class="mb-2"
+                                            />
+                                            <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                                                <div class="image-section">
+                                                    <img class="position-relative" [ngSrc]="brand.imagePath" fill [alt]="brand.name" />
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </ng-container>
+                                    <ng-template #noBrands>
+                                        <h3 class="fw-normal mb-0">No brands associated with this filter.</h3>
+                                    </ng-template>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 gap-md-4 justify-content-between justify-content-md-start mx-2 my-2 align-items-end">
+                                <ng-container *ngIf="form.controls?.['product']?.value !== 'Unknown'">
+                                    <label *ngFor="let brand of product.brands" class="mb-2 mb-md-0">
+                                        <input
+                                            type="radio"
+                                            name="brand"
+                                            [value]="brand.name"
+                                            formControlName="brand"
+                                            (change)="onBrandSelectionChange(brand.name)"
+                                            class="mb-2"
+                                        />
+                                        <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                                            <div class="image-section">
+                                                <img class="position-relative" [ngSrc]="brand.imagePath" fill [alt]="brand.name" />
+                                            </div>
+                                        </div>
+                                    </label>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="form.controls?.['product']?.value === 'Unknown' && form.controls?.['brand']?.value">
+            <div class="products_section vertical-tabs-section" #strengthSection>
+                <h2 class="mb-1">Select a Product below</h2>
+                <div class="d-flex flex-wrap gap-4 justify-content-between justify-content-md-start mx-2 my-2 align-items-end">
+                    <ng-container *ngFor="let product of filteredProducts; let i = index">
+                        <label>
+                            <input
+                                type="radio"
+                                name="product"
+                                [value]="product.name"
+                                formControlName="product"
+                                (change)="onProductSelectionChange(i)"
+                                class="mb-2"
+                            />
+                            <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                                <div class="image-section">
+                                    <img class="position-relative" [ngSrc]="product.imagePath" fill [alt]="product.name" />
+                                </div>
+                                <div class="image-caption fw-semibold w-100 py-2 text-center">
+                                    {{ product.name }}
+                                </div>
+                            </div>
+                        </label>
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="my-3" *ngIf="form.controls?.['brand']?.value" #strengthSection>
+            <div class="mt-3">
+                <mat-form-field class="default-control-width" appearance="outline">
+                    <mat-label>Please select a strength for which you want to report an event?</mat-label>
+                    <mat-select formControlName="strength">
+                        <mat-option value="50.00 MG">50.00 MG</mat-option>
+                        <mat-option value="5 doses of 0.50 mL">5 doses of 0.50 mL</mat-option>
+                        <mat-option value="100.00 MG">100.00 MG</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="mb-0">
+                <mat-form-field class="default-control-width" appearance="outline">
+                    <mat-label>Can you return the product back to us (Field product return pre-paid kit will be provided)</mat-label>
+
+                    <mat-select formControlName="returnOption">
+                        <mat-option *ngFor="let option of returnOptionValues" [value]="option">{{ option }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="mb-2">
+                <div class="d-flex align-items-center">
+                    <label>Do you know the Batch/Lot Number</label>
+                    <button
+                        mat-icon-button
+                        matSuffix
+                        (click)="showLotNumberHelp()"
+                        [attr.aria-label]="'Help finding this'"
+                        style="width: 30px; height: 30px; padding: 0 10px"
+                    >
+                        <mat-icon>help</mat-icon>
+                    </button>
+                </div>
+                <mat-radio-group aria-label="Do you know the Batch or Lot Number" color="primary" formControlName="hasBatchLotNumber">
+                    <mat-radio-button [value]="true" class="me-2" (change)="handleBatchLotNumberChange($event.value)">Yes</mat-radio-button>
+                    <mat-radio-button [value]="false" (change)="handleBatchLotNumberChange($event.value)">No</mat-radio-button>
+                </mat-radio-group>
+            </div>
+
+            <div
+                *ngIf="
+                form.controls?.['hasBatchLotNumber']?.value &&
+                form.controls?.['hasBatchLotNumber']?.value === true
+            "
+                class="mt-3"
+            >
+                <mat-form-field class="default-control-width" appearance="outline">
+                    <mat-label>Please enter Batch/Lot Number</mat-label>
+                    <input matInput placeholder="Please enter Batch/Lot Number" formControlName="batchLotNumber" />
+                </mat-form-field>
+            </div>
+
+            <div
+                *ngIf="
+                !form.controls?.['hasBatchLotNumber']?.value &&
+                form.controls?.['hasBatchLotNumber']?.value === false
+            "
+            >
+                <div class="mt-3">
+                    <mat-form-field class="default-control-width" appearance="outline">
+                        <mat-label>Reason for not providing the batch/lot number</mat-label>
+                        <input matInput placeholder="Reason for not providing the batch/lot number" formControlName="noReason" />
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12 col-lg-6">
+                    <mat-form-field class="default-control-width mb-2" appearance="outline">
+                        <mat-label>GTIN #</mat-label>
+                        <input matInput placeholder="GTIN #" formControlName="gtin" />
+                    </mat-form-field>
+                </div>
+
+                <div class="col-sm-12 col-lg-6">
+                    <mat-form-field class="default-control-width mb-2" appearance="outline">
+                        <mat-label>Serial #</mat-label>
+                        <input matInput placeholder="Serial #" formControlName="serial" />
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <div formGroupName="hcp" class="mt-1" *ngIf="form.controls?.['userType']?.value === UserTypes.HealthcareProfessional">
+                <div>
+                    <mat-form-field class="default-control-width" appearance="outline">
+                        <mat-label>Was this complaint reported from a J&J program?</mat-label>
+                        <mat-select formControlName="reportedFromJNJProgram">
+                            <mat-option [value]="true" class="me-2">Yes</mat-option>
+                            <mat-option [value]="false">No</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="row" *ngIf="form.get('hcp.reportedFromJNJProgram')?.value === true">
+                    <div class="col-sm-12 col-lg-4">
+                        <mat-form-field class="default-control-width" appearance="outline">
+                            <mat-label>Study Program</mat-label>
+                            <input matInput placeholder="Study Program" formControlName="studyProgram" />
+                        </mat-form-field>
+                    </div>
+                    <div class="col-sm-12 col-lg-4">
+                        <mat-form-field class="default-control-width" appearance="outline">
+                            <mat-label>Site Number</mat-label>
+                            <input matInput placeholder="Site Number" formControlName="siteNumber" />
+                        </mat-form-field>
+                    </div>
+                    <div class="col-sm-12 col-lg-4">
+                        <mat-form-field class="default-control-width" appearance="outline">
+                            <mat-label>Subject Number</mat-label>
+                            <input matInput placeholder="Subject Number" formControlName="subjectNumber" />
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-1">
+                <p class="lh-base">Which part of the product you want to report the complaint for?</p>
+
+                <div *ngFor="let question of imageHotspotValues">
+                    <ng-container *ngIf="question.type === 'image-map'">
+                        <label *ngIf="question.questionText">{{ question.questionText }}</label>
+                        <app-image-map [imageSrc]="question.imageUrl" [areas]="question.areas"></app-image-map>
+                        <!-- <app-image-hotspot [imageSrc]="question.imageUrl" [areas]="question.areas"></app-image-hotspot> -->
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="mb-1 mt-2">
+                <mat-form-field class="default-control-width mb-2" appearance="outline">
+                    <mat-label>Describe your issue</mat-label>
+                    <mat-hint>Please include any details that may be relevant</mat-hint>
+                    <textarea matInput placeholder="Describe your issue" formControlName="issueDescription"></textarea>
+                </mat-form-field>
+            </div>
+
+            <div class="mb-1">
+                <app-image-upload formControlName="uploadImage" text="Upload images (optional)"></app-image-upload>
+            </div>
         </div>
-      </div>
-
-      <div class="mb-1 mt-2">
-        <mat-form-field class="default-control-width mb-2" appearance="outline">
-          <mat-label>Describe your issue</mat-label>
-          <mat-hint>Please include any details that may be relevant</mat-hint>
-          <textarea
-            matInput
-            placeholder="Describe your issue"
-            formControlName="issueDescription"
-          ></textarea>
-        </mat-form-field>
-      </div>
-
-      <div class="mb-1">
-        <app-image-upload
-          formControlName="uploadImage"
-          text="Upload images (optional)"
-        ></app-image-upload>
-      </div>
     </div>
-  </div>
 
-  <div class="mt-4 d-flex justify-content-end w-100">
-    <button
-      mat-raised-button
-      color="primary"
-      class="primary-btn"
-      matStepperNext (click)="emitDataChanges()"
-      [disabled]="!complaintReportingFormGroup.valid"
-    >
-      Continue <mat-icon iconPositionEnd>arrow_forward</mat-icon>
-    </button>
-  </div>
+    <div class="mt-4 d-flex justify-content-end w-100">
+        <button mat-raised-button color="primary" class="primary-btn" matStepperNext [disabled]="!form.valid">
+            Continue <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+        </button>
+    </div>
 </form>

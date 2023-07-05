@@ -1,144 +1,170 @@
 @import "variables";
 
 .default-control-width {
-  width: 100%;
+    width: 100%;
+
+    ::ng-deep {
+        .mat-mdc-form-field-hint-wrapper {
+            padding: 0;
+        }
+    }
 }
 
 .empty-selection {
-  color: #6c757d;
-  margin: 3rem;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    color: #6c757d;
+    margin: 3rem;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
 .min-height-300 {
-  min-height: 300px;
-}
-
-@media (max-width: 992px) {
-  .empty-selection {
-    margin: 0;
-    margin-top: 1rem;
-    h2 {
-      padding: 1rem;
-    }
-  }
-
-  .privacy-text {
-    width: 75%;
-  }
-
-  .mat-stepper-horizontal {
-    ::ng-deep {
-      .mat-horizontal-stepper-header-container {
-        padding: 0rem;
-      }
-    }
-  }
+    min-height: 300px;
 }
 
 .vertical-tabs-section {
-  .vertical-tabs {
-    ::ng-deep {
-      button {
-        color: gray;
-        font-weight: 500;
-        text-align: left;
-        font-size: 16px;
-      }
-    }
-    &.nav-pills .nav-link {
-      &.active {
-        border: 3px solid $primary-color;
-        color: $primary-color;
-        background-color: #fff;
-      }
-    }
-  }
-
-  .tab-content {
-    padding: 0.5rem 1rem;
-  }
-
-  [type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  [type="radio"] + img {
-    width: 200px;
-    height: 150px;
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  [type="radio"] + .product-section {
-    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
-      rgba(17, 17, 26, 0.1) 0px 0px 8px;
-    cursor: pointer;
-    transition: transform 0.5s;
-    &:hover {
-      transform: scale(1.1);
+    .vertical-tabs {
+        ::ng-deep {
+            button {
+                color: gray;
+                font-weight: 500;
+                // width: 95%;
+                text-align: left;
+                font-size: 16px;
+            }
+        }
+        &.nav-pills .nav-link {
+            &.active {
+                border: 3px solid $primary-color;
+                color: $primary-color;
+                background-color: #fff;
+            }
+        }
     }
 
-    .image-section {
-      border-top-left-radius: 0.5rem;
-      border-top-right-radius: 0.5rem;
+    .tab-content {
+        padding: 0.5rem 1rem;
     }
 
-    .image-caption {
-      background: #cccccc8c;
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
-    }
-  }
-
-  [type="radio"]:checked + .product-section {
-    outline: 3px solid $primary-color;
-    box-shadow: $primary-color 0px 3px 8px;
-    &:hover {
-      transform: scale(1);
+    [type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
     }
 
-    .image-caption {
-      background: #0a58ca;
-      color: #fff;
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
+    [type="radio"] + img {
+        width: 200px;
+        height: 150px;
+        border-radius: 0.5rem;
+        cursor: pointer;
     }
-  }
+
+    [type="radio"] + .product-section {
+        box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
+            rgba(17, 17, 26, 0.1) 0px 0px 8px;
+        cursor: pointer;
+        transition: transform 0.5s;
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        .image-section {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            width: 150px;
+            height: 150px;
+            margin: 2px;
+        }
+
+        .image-caption {
+            background: #cccccc8c;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+    }
+
+    [type="radio"]:checked + .product-section {
+        outline: 3px solid $primary-color;
+        box-shadow: $primary-color 0px 3px 8px;
+        &:hover {
+            transform: scale(1);
+        }
+
+        .image-caption {
+            background: #0a58ca;
+            color: #fff;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+    }
 }
 
 .brands_section {
-  .filter-section {
-    button {
-      &.active {
-        background-color: $primary-color;
-        color: #fff;
-      }
+    .filter-section {
+        button {
+            &.active {
+                background-color: $primary-color;
+                color: #fff;
+            }
+        }
     }
-  }
+}
+
+.mat-step-header .mat-step-icon-selected {
+    background-color: $primary-color;
+}
+
+.mat-mdc-standard-chip.mat-primary.mat-mdc-chip-selected {
+    background-color: $primary-color;
 }
 
 .chip-options-sections {
-  [type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
+    [type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
 
-  [type="radio"] + img {
-    width: 200px;
-    height: 150px;
-    border-radius: 0.5rem;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    cursor: pointer;
-  }
+    [type="radio"] + img {
+        width: 200px;
+        height: 150px;
+        border-radius: 0.5rem;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        cursor: pointer;
+    }
 
-  [type="radio"]:checked + img {
-    outline: 3px solid $primary-color;
-    box-shadow: $primary-color 0px 3px 8px;
-  }
+    [type="radio"]:checked + img {
+        outline: 3px solid $primary-color;
+        box-shadow: $primary-color 0px 3px 8px;
+    }
+}
+
+@media screen and (min-width: 800px) {
+    form mat-form-field + mat-form-field {
+        margin-left: 8px;
+    }
+}
+
+@media (max-width: 992px) {
+    .empty-selection {
+        margin: 0;
+        margin-top: 1rem;
+        h2 {
+            padding: 1rem;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .vertical-tabs-section {
+        [type="radio"] + .product-section {
+            .image-section {
+                width: 120px;
+                height: 120px;
+            }
+
+            .image-caption {
+            }
+        }
+    }
 }

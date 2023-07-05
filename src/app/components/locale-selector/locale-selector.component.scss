@@ -1,5 +1,11 @@
-a {
-  color: #019cdc;
-  font-size: 16px;
-  text-decoration: none;
+.locale-section {
+    a {
+        color: #019cdc;
+        font-size: 16px;
+        text-decoration: none;
+
+        &:hover {
+            color: #036;
+        }
+    }
 }

@@ -2,19 +2,19 @@
 
 // @include mat.core();
 
-@import '@angular/material/theming';
+@import "@angular/material/theming";
 
 @include mat-core();
 
 $default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-  Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-  "Segoe UI Symbol";
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
 
-  $mat-typography-config: mat-typography-config(
+$mat-typography-config: mat-typography-config(
     $font-family: $default-font-family
-  );
+);
 
-  @include angular-material-typography($mat-typography-config);
+@include angular-material-typography($mat-typography-config);
 
 // $primary-palette: (
 //   50: #efe5fd,

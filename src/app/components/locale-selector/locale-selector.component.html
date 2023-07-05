@@ -25,37 +25,56 @@
   class="basic-container w-100 h-100 d-flex flex-column"
 > -->
 <form class="basic-container w-100 h-100 d-flex flex-column">
-  <div
-    class="w-100 h-100 d-flex flex-column language-selector bg-white rounded-3 shadow px-5 py-3"
-  >
-    <!-- <h1 class="fw-semibold">Please choose your preferred language</h1>
+    <div class="w-100 h-100 d-flex flex-column language-selector bg-white rounded-3 shadow px-3 px-md-5 py-3">
+        <!-- <h1 class="fw-semibold">Please choose your preferred language</h1>
     <p class="fst-italic border-top pt-3 text-center">
       Modifying the selected country while filling out the form will result in a
       re-entry of all report information.
     </p> -->
-    <div class="d-flex flex-column">
-      <h3 class="fw-semibold mb-0 text-secondary fs-5"> Modifying the selected country while filling out the form will result in a re-entry of all report information.</h3>
-    </div>
-    <hr class="mt-2">
-    <div class="d-flex flex-column">
-        <div class="columns large-2 no-padding-right mobile-no-padding fs-5">
-          <ng-container *ngFor="let territory of territories">
-            <div class="territory my-3 fw-semibold text-secondary border-bottom d-inline-block pb-2">{{ territory.name }}</div>
-            <div class="countrylist">
-              <ul class="list-unstyled">
-                <li *ngFor="let country of territory.countries">
-                  <p class="country mb-1 fw-semibold text-secondary">{{ country.name }}</p>
-                  <p class="languages">
-                    <span *ngFor="let language of country.languages" class="me-2">
-                      <a *ngIf="language.code" [routerLink]="'/' + country.code + '/' + language.code + '/home'" (click)="selectLocale(country.name, language.name)">{{ language.name }}</a>
-                      <a *ngIf="!language.code" [routerLink]="'/' + country.code + '/home'" (click)="selectLocale(country.name)">{{ language.name }}</a>
-                    </span>
-                  </p>
-                </li>
-              </ul>
+        <div class="d-flex flex-column">
+            <h3 class="fw-semibold mb-0 text-secondary fs-5">
+                Modifying the selected country while filling out the form will result in a re-entry of all report information.
+            </h3>
+        </div>
+        <hr class="mt-2" />
+        <div class="d-flex flex-column locale-section">
+            <div class="columns large-2 no-padding-right mobile-no-padding fs-5 d-flex flex-column flex-md-row gap-2 gap-md-5">
+                <div *ngFor="let territory of territories" class="d-flex flex-column">
+                    <div class="territory my-3 fw-semibold text-secondary border-bottom d-inline-block pb-2">{{ territory.name }}</div>
+                    <div class="countrylist">
+                        <ul class="list-unstyled">
+                            <li *ngFor="let country of territory.countries">
+                                <p class="country mb-1 fw-semibold text-secondary">{{ country.name }}</p>
+                                <p class="languages">
+                                    <span *ngFor="let language of country.languages" class="me-2">
+                                        <!-- <a
+                                            *ngIf="language.code"
+                                            [routerLink]="'/' + country.code + '/' + language.code + '/home'"
+                                            (click)="selectLocale(country.code, language.name)"
+                                            >{{ language.name }}</a
+                                        >
+                                        <a *ngIf="!language.code" [routerLink]="'/' + country.code + '/home'" (click)="selectLocale(country.code)">{{
+                                            language.name
+                                        }}</a> -->
+                                        <a
+                                            *ngIf="language.code; else noLanguageCode"
+                                            (click)="selectLocale(country.code, language.name)"
+                                            class="cursor-pointer fw-medium"
+                                        >
+                                            {{ language.name }}
+                                        </a>
+                                        <ng-template #noLanguageCode>
+                                            <a (click)="selectLocale(country.code)" class="cursor-pointer fw-medium">
+                                                {{ language.name }}
+                                            </a>
+                                        </ng-template>
+                                    </span>
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-          </ng-container>
         </div>
     </div>
-  </div>
 </form>

@@ -1,6 +1,5 @@
 <div>
-    <input #csvInput multiple hidden="true" type="file" onclick="this.value=null"
-        (change)="onFile($any($event.target).files)" accept="image/*" />
+    <input #csvInput multiple hidden="true" type="file" onclick="this.value=null" (change)="onFile($any($event.target).files)" accept="image/*" />
     <button mat-flat-button color="primary" (click)="openFilePicker(csvInput)">{{ text }}</button>
 </div>
 
@@ -18,7 +17,7 @@
 
     <mat-list>
         <mat-list-item *ngFor="let image of images">
-            <img matListItemAvatar src="{{ image.previewUrl }}" alt="{{ image.file.name }}">
+            <img matListItemAvatar src="{{ image.previewUrl }}" alt="{{ image.file.name }}" />
             <h3 matListItemTitle>{{ image.file.name }}</h3>
             <span matListItemLine><a role="button" type="button" (click)="removeImage(image)">Remove</a></span>
         </mat-list-item>

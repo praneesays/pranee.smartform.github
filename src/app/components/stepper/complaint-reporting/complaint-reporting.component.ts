@@ -1,291 +1,395 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
 import {
-  FormGroup,
-  FormBuilder,
-  Validators,
-  FormControl,
-} from '@angular/forms';
-import { startWith, map, Observable } from 'rxjs';
+    FormGroup,
+    FormBuilder,
+    Validators,
+    FormControl,
+    AbstractControl
+} from "@angular/forms";
+import { startWith, map, Observable, takeUntil, Subject } from "rxjs";
 import {
-  IComplaintReporting,
-  UserTypes,
-  ReturnOption,
-  IHcpData,
-  Country,
-  Brand,
-  Product,
-} from 'src/app/types';
-import { Question } from 'src/app/questions';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { LotNumberHelpBottomSheetComponent } from 'src/app/bottom-sheets/lot-number-help-bottom-sheet/lot-number-help-bottom-sheet.component';
-import { FormGroupType } from '../stepper.component';
+    IComplaintReporting,
+    UserTypes,
+    ReturnOption,
+    Country,
+    Brand,
+    Product
+} from "src/app/types";
+import { Question } from "src/app/questions";
+import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { LotNumberHelpBottomSheetComponent } from "src/app/bottom-sheets/lot-number-help-bottom-sheet/lot-number-help-bottom-sheet.component";
+import { FormGroupType } from "../stepper.component";
 
 @Component({
-  selector: 'app-complaint-reporting',
-  templateUrl: './complaint-reporting.component.html',
-  styleUrls: ['./complaint-reporting.component.scss'],
+    selector: "app-complaint-reporting",
+    templateUrl: "./complaint-reporting.component.html",
+    styleUrls: ["./complaint-reporting.component.scss"]
 })
-export class ComplaintReportingComponent {
-  readonly complaintReportingFormGroup: FormGroup<
-    FormGroupType<IComplaintReporting>
-  >;
+export class ComplaintReportingComponent implements OnInit, OnDestroy {
+    readonly UserTypes = UserTypes;
+    readonly userTypeValues: string[] = Object.values(UserTypes);
+    readonly returnOptionValues: string[] = Object.values(ReturnOption);
+    readonly countries: Country[] = Object.values(Country);
 
-  readonly UserTypes = UserTypes;
+    @Input() form!: FormGroup<FormGroupType<IComplaintReporting>>;
+    @Input() products!: Product[];
 
-  @Input()
-  products!: Product[];
+    countriesList?: Observable<string[]>;
+    imageHotspotValues: Question[] = [];
+    filteredProducts: Product[] = this.products;
+    filteredBrands: Brand[] = [];
+    showAllProducts: boolean = true;
+    selectedProductIndex: number = -1;
+    selectedBrand: string = "";
 
-  @Output() dataChanged = new EventEmitter<any>();
+    newImageHotspotValues: Question[] = [];
 
-  countries: Country[] = Object.values(Country);
-  countriesList?: Observable<string[]>;
+    private readonly destroy$ = new Subject<void>();
 
-  returnOptionValues: string[] = Object.values(ReturnOption);
+    constructor(private readonly bottomSheet: MatBottomSheet) {
+        this.imageHotspotValues = [
+            {
+                id: "simponi_device_failure_location",
+                type: "image-map",
+                required: true,
+                questionText: "",
+                imageUrl:
+                    "https://www.simponihcp.com/sites/www.simponihcp.com/files/injection_experience_autoinjector_desktop_1.png",
+                areas: [
+                    {
+                        value: "Hidden Needle",
 
-  showAllProducts: boolean = true;
-  selectedProductIndex: number = -1;
+                        x: 394,
+                        y: 283,
+                        radius: 22,
 
-  filteredProducts: Product[] = [];
+                        nextQuestionId: "needle_damage_type"
+                    },
+                    {
+                        value: "Safety Sleeve",
 
-  filteredBrands: Brand[] = [];
-  selectedBrand: string = '';
+                        x: 440,
+                        y: 253,
+                        radius: 22,
 
-  imageHotspotValues: Question[] = [];
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Tamper-Evident Seal",
 
-  constructor(private readonly bottomSheet: MatBottomSheet, private readonly fb: FormBuilder) {
-    this.complaintReportingFormGroup = fb.group<
-      FormGroupType<IComplaintReporting>
-    >({
-      userType: fb.control<UserTypes | null>(null, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      purchasedCountry: fb.control<Country | null>(null, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      product: fb.control<string>('', {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      brand: fb.control<string>('', {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      strength: fb.control<string>('', {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      returnOption: fb.control<ReturnOption | null>(null, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      hasBatchLotNumber: fb.control<boolean | null>(null, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      batchLotNumber: fb.control<string>('', {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      noReason: fb.control<string>('', {
-        nonNullable: true,
-        validators: [],
-      }),
-      gtin: fb.control<string>('', {
-        nonNullable: true,
-        validators: [],
-      }),
-      serial: fb.control<string>('', {
-        nonNullable: true,
-        validators: [],
-      }),
-      hcp: fb.group<FormGroupType<IHcpData>>({
-        reportedFromJNJProgram: fb.control<boolean | null>(null, {
-          nonNullable: true,
-          validators: [],
-        }),
-        studyProgram: fb.control<string>('', {
-          nonNullable: true,
-          validators: [],
-        }),
-        siteNumber: fb.control<string>('', {
-          nonNullable: true,
-          validators: [],
-        }),
-        subjectNumber: fb.control<string>('', {
-          nonNullable: true,
-          validators: [],
-        }),
-      }),
-      issueDescription: fb.control<string>('', {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-      uploadImage: fb.control<File[]>([], {
-        nonNullable: true,
-        validators: [],
-      }),
-    });
+                        x: 545,
+                        y: 317,
+                        radius: 22,
 
-    this.imageHotspotValues = [
-      {
-        id: 'simponi_device_failure_location',
-        type: 'image-map',
-        required: true,
-        questionText: '',
-        imageUrl:
-          'https://www.simponihcp.com/sites/www.simponihcp.com/files/injection_experience_autoinjector_desktop_1.png',
-        areas: [
-          {
-            value: 'Hidden Needle',
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Large Viewing Window",
 
-            x: 394,
-            y: 283,
-            radius: 22,
+                        x: 625,
+                        y: 250,
+                        radius: 22,
 
-            nextQuestionId: 'needle_damage_type',
-          },
-          {
-            value: 'Safety Sleeve',
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Activation Button",
 
-            x: 440,
-            y: 253,
-            radius: 22,
+                        x: 750,
+                        y: 236,
+                        radius: 22,
 
-            nextQuestionId: 'who_administered',
-          },
-          {
-            value: 'Tamper-Evident Seal',
+                        nextQuestionId: "button_stuck"
+                    },
+                    {
+                        value: "Easy-to-Grip Shape",
 
-            x: 545,
-            y: 317,
-            radius: 22,
+                        x: 927,
+                        y: 300,
+                        radius: 22,
 
-            nextQuestionId: 'who_administered',
-          },
-          {
-            value: 'Large Viewing Window',
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Expiration Date",
 
-            x: 625,
-            y: 250,
-            radius: 22,
+                        x: 1055,
+                        y: 328,
+                        radius: 22,
 
-            nextQuestionId: 'who_administered',
-          },
-          {
-            value: 'Activation Button',
+                        nextQuestionId: "who_administered"
+                    }
+                ]
+            }
+        ];
 
-            x: 750,
-            y: 236,
-            radius: 22,
+        this.newImageHotspotValues = [
+            {
+                id: "simponi_autoinjector",
+                type: "image-map",
+                required: true,
+                questionText: "",
+                imageUrl: "../../../../assets/Autoinjector.png",
+                areas: [
+                    {
+                        value: "Hidden Needle",
 
-            nextQuestionId: 'button_stuck',
-          },
-          {
-            value: 'Easy-to-Grip Shape',
+                        x: 394,
+                        y: 283,
+                        radius: 22,
 
-            x: 927,
-            y: 300,
-            radius: 22,
+                        nextQuestionId: "needle_damage_type"
+                    },
+                    {
+                        value: "Safety Sleeve",
 
-            nextQuestionId: 'who_administered',
-          },
-          {
-            value: 'Expiration Date',
+                        x: 440,
+                        y: 253,
+                        radius: 22,
 
-            x: 1055,
-            y: 328,
-            radius: 22,
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Tamper-Evident Seal",
 
-            nextQuestionId: 'who_administered',
-          },
-        ],
-      },
-    ];
+                        x: 545,
+                        y: 317,
+                        radius: 22,
 
-    this.filteredProducts = this.products;
-  }
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Large Viewing Window",
 
-  ngOnInit() {
-    if (this.complaintReportingFormGroup.controls.purchasedCountry) {
-      this.countriesList =
-        this.complaintReportingFormGroup.controls.purchasedCountry.valueChanges.pipe(
-          startWith(''),
-          map((value) => this._filter(value || ''))
+                        x: 625,
+                        y: 250,
+                        radius: 22,
+
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Activation Button",
+
+                        x: 750,
+                        y: 236,
+                        radius: 22,
+
+                        nextQuestionId: "button_stuck"
+                    },
+                    {
+                        value: "Easy-to-Grip Shape",
+
+                        x: 927,
+                        y: 300,
+                        radius: 22,
+
+                        nextQuestionId: "who_administered"
+                    },
+                    {
+                        value: "Expiration Date",
+
+                        x: 1055,
+                        y: 328,
+                        radius: 22,
+
+                        nextQuestionId: "who_administered"
+                    }
+                ]
+            }
+        ];
+    }
+
+    ngOnInit() {
+        if (this.form.controls?.["purchasedCountry"]) {
+            this.countriesList = this.form.controls?.[
+                "purchasedCountry"
+            ].valueChanges.pipe(
+                startWith(""),
+                map((value) => this._filter(value || ""))
+            );
+        }
+
+        this.products.forEach((product) => {
+            this.filteredBrands =
+                product.name === "Unknown" ? product.brands : [];
+            this.sortBrands(product.brands);
+        });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    onUserTypeChange(value: string) {
+        if (value === UserTypes.HealthcareProfessional) {
+            this.initializeHcpFormGroup();
+        } else {
+            this.clearHcpFormGroup();
+        }
+        this.hcpFormGroup.updateValueAndValidity();
+    }
+
+    onProductSelectionChange(index: number): void {
+        this.selectedBrandControl.setValue(null);
+        this.selectedProductIndex = index;
+        this.showAllProducts = false;
+    }
+
+    toggleProducts() {
+        this.showAllProducts = !this.showAllProducts;
+    }
+
+    filterbrands(filter: string, productName: string) {
+        const productList = this.products.find(
+            (product) => product.name == productName
+        );
+
+        if (productList) {
+            if (productName === "Unknown") {
+                this.filteredBrands = productList.brands.filter((brand) =>
+                    filter
+                        ? brand.name.charAt(0).toUpperCase() >=
+                              filter.charAt(0).toUpperCase() &&
+                          brand.name.charAt(0).toUpperCase() <=
+                              filter.charAt(2).toUpperCase()
+                        : true
+                );
+            } else {
+                this.filteredBrands = productList.brands;
+            }
+        }
+        this.sortBrands(this.filteredBrands);
+        this.selectedBrand = filter;
+    }
+
+    sortBrands(brands: Brand[]) {
+        brands.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    onBrandSelectionChange(brandName: string): void {
+        this.selectedBrandControl.setValue(brandName);
+        // this.scrollToStrengthSection();
+        this.filteredProducts = this.products.filter(
+            (product) =>
+                product.brands.some(
+                    (brand) =>
+                        brand.name.toLowerCase() === brandName.toLowerCase()
+                ) && product.name !== "Unknown"
         );
     }
-  }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.countries.filter((country) =>
-      country.toLowerCase().includes(filterValue)
-    );
-  }
-
-  get selectedProductControl(): FormControl {
-    return this.complaintReportingFormGroup.get('product') as FormControl;
-  }
-
-  get selectedBrandControl(): FormControl {
-    return this.complaintReportingFormGroup.get('brand') as FormControl;
-  }
-
-  onProductSelectionChange(index: number): void {
-    this.selectedBrandControl.setValue(null);
-    this.selectedProductIndex = index;
-    this.showAllProducts = false;
-  }
-
-  toggleProducts() {
-    this.showAllProducts = !this.showAllProducts;
-  }
-
-  onBrandSelectionChange(brandName: string): void {
-    this.selectedBrandControl.setValue(brandName);
-    this.filteredProducts = this.products.filter(
-      (product) =>
-        product.brands.some(
-          (brand) => brand.name.toLowerCase() === brandName
-        ) && product.name !== 'Unknown'
-    );
-  }
-
-  filterbrands(filter: string, productName: string) {
-    const productList = this.products.find(
-      (product) => product.name == productName
-    );
-
-    if (productList) {
-      if (productName === 'Unknown') {
-        this.filteredBrands = productList.brands.filter((brand) =>
-          filter
-            ? brand.name.charAt(0).toUpperCase() >=
-                filter.charAt(0).toUpperCase() &&
-              brand.name.charAt(0).toUpperCase() <=
-                filter.charAt(2).toUpperCase()
-            : true
-        );
-      } else {
-        this.filteredBrands = productList.brands;
-      }
+    showLotNumberHelp() {
+        this.bottomSheet.open(LotNumberHelpBottomSheetComponent);
     }
-    this.sortBrands(this.filteredBrands);
-    this.selectedBrand = filter;
-  }
 
-  sortBrands(brands: Brand[]) {
-    brands.sort((a, b) => a.name.localeCompare(b.name));
-  }
+    // handleBatchLotNumberChange(value: boolean) {
+    //     const batchLotNumber = this.form.get("batchLotNumber");
+    //     const noReason = this.form?.get("noReason");
 
-  showLotNumberHelp() {
-    this.bottomSheet.open(LotNumberHelpBottomSheetComponent);
-  }
+    //     if (!batchLotNumber) {
+    //         return;
+    //     }
 
-  emitDataChanges() {
-    const data = this.complaintReportingFormGroup;
-    this.dataChanged.emit(data);
-  }
+    //     if (!noReason) {
+    //         return;
+    //     }
+
+    //     if (value) {
+    //         this.clearValidatorsAndSetValue(noReason);
+    //         this.setRequiredValidator(batchLotNumber);
+    //     } else {
+    //         this.clearValidatorsAndSetValue(batchLotNumber);
+    //         this.setRequiredValidator(noReason);
+    //     }
+
+    //     this.updateFormControlValidity(batchLotNumber);
+    //     this.updateFormControlValidity(noReason);
+    // }
+
+    handleBatchLotNumberChange(value: boolean) {
+        const batchLotNumber = this.form.get("batchLotNumber");
+        const noReason = this.form?.get("noReason");
+
+        if (!batchLotNumber) {
+            return;
+        }
+
+        if (!noReason) {
+            return;
+        }
+
+        if (value) {
+            noReason.disable();
+            batchLotNumber.enable();
+            noReason.reset();
+        } else {
+            noReason.enable();
+            batchLotNumber.disable();
+            batchLotNumber.reset();
+        }
+    }
+
+    setRequiredValidator(control: AbstractControl) {
+        control?.setValidators(Validators.required);
+    }
+
+    clearValidatorsAndSetValue(control: AbstractControl) {
+        control?.setValue("");
+        control?.clearValidators();
+    }
+
+    updateFormControlValidity(control: AbstractControl) {
+        control?.updateValueAndValidity();
+    }
+
+    get selectedProductControl(): FormControl {
+        return this.form.get("product") as FormControl;
+    }
+
+    get selectedBrandControl(): FormControl {
+        return this.form.get("brand") as FormControl;
+    }
+
+    get hcpFormGroup() {
+        return this.form.get("hcp") as FormGroup;
+    }
+
+    private initializeHcpFormGroup() {
+        const reportedFromJNJProgramControl = this.hcpFormGroup.get(
+            "reportedFromJNJProgram"
+        );
+        const studyProgramControl = this.hcpFormGroup.get("studyProgram");
+        const siteNumberControl = this.hcpFormGroup.get("siteNumber");
+        const subjectNumberControl = this.hcpFormGroup.get("subjectNumber");
+
+        reportedFromJNJProgramControl?.setValidators([Validators.required]);
+
+        reportedFromJNJProgramControl?.valueChanges
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((value) => {
+                if (value) {
+                    studyProgramControl?.setValidators([Validators.required]);
+                    siteNumberControl?.setValidators([Validators.required]);
+                    subjectNumberControl?.setValidators([Validators.required]);
+                } else {
+                    studyProgramControl?.updateValueAndValidity();
+                    siteNumberControl?.updateValueAndValidity();
+                    subjectNumberControl?.updateValueAndValidity();
+                }
+            });
+        reportedFromJNJProgramControl?.updateValueAndValidity();
+    }
+
+    private clearHcpFormGroup() {
+        this.hcpFormGroup.clearValidators();
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+
+        return this.countries.filter((country) =>
+            country.toLowerCase().includes(filterValue)
+        );
+    }
 }

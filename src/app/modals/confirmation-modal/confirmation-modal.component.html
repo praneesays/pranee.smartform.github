@@ -1,0 +1,10 @@
+<div class="d-flex flex-column w-100 h-100 gap-2">
+    <h3 mat-dialog-title class="border-bottom">Unsaved Changes</h3>
+    <div mat-dialog-content class="mh-100">
+        <p>Your changes will not be saved if you select a different country.</p>
+    </div>
+    <div mat-dialog-actions class="border-top justify-content-end">
+        <button mat-button [mat-dialog-close]="false">Cancel</button>
+        <button mat-button [mat-dialog-close]="true" cdkFocusInitial class="basic-btn">Confirm</button>
+    </div>
+</div>

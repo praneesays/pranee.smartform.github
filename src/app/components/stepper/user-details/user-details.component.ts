@@ -1,485 +1,152 @@
-import { Component, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { DateTime } from 'luxon';
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { FormGroup, Validators } from "@angular/forms";
 import {
-  IUserDetails,
-  UserTypes,
-  Title,
-  IPatientInformation,
-  ContactPermission,
-  IPatientDetails,
-  IContactInformation,
-  PhysicianAwareness,
-  ContactPermissionHCP,
-  IHCPDetails,
-  IPatientReporterInformation,
-  ContactPermissionReporter,
-  IReporterDetails,
-  ReporterAdministration,
-  Country,
-} from 'src/app/types';
-import { FormGroupType } from '../stepper.component';
-import { Observable, startWith, map } from 'rxjs';
+    IUserDetails,
+    UserTypes,
+    Title,
+    ContactPermission,
+    PhysicianAwareness,
+    ContactPermissionHCP,
+    ContactPermissionReporter,
+    ReporterAdministration,
+    Country,
+    Product,
+    IComplaintReporting
+} from "src/app/types";
+import { Observable, startWith, map, Subject, takeUntil } from "rxjs";
+import { FormGroupType } from "../stepper.component";
 
 @Component({
-  selector: 'app-user-details',
-  templateUrl: './user-details.component.html',
-  styleUrls: ['./user-details.component.scss'],
+    selector: "app-user-details",
+    templateUrl: "./user-details.component.html",
+    styleUrls: ["./user-details.component.scss"]
 })
-export class UserDetailsComponent {
-
-  @Input() 
-  complaintReportingFormGroup!: any;
-
-  readonly userDetailsFormGroup: FormGroup<FormGroupType<IUserDetails>>;
-  readonly UserTypes = UserTypes;
-
-  titleOptions: string[] = Object.values(Title);
-  permissionToContactValues: string[] = Object.values(ContactPermission);
-  permissionToContactHCPValues: string[] = Object.values(ContactPermissionHCP);
-  physicianAwarenessValues: string[] = Object.values(PhysicianAwareness);
-  permissionToContactReporterValues: string[] = Object.values(
-    ContactPermissionReporter
-  );
-  reporterAdministrationValues: string[] = Object.values(
-    ReporterAdministration
-  );
-
-  countries: Country[] = Object.values(Country);
-  countriesList?: Observable<string[]>;
-
-  isStep1Completed: boolean = false;
-
-  constructor(private readonly fb: FormBuilder) {
-    this.userDetailsFormGroup = fb.group<FormGroupType<IUserDetails>>({
-      userType: fb.control<UserTypes | null>(null, {
-        nonNullable: true,
-        validators: [Validators.required],
-      }),
-
-      patientInformation: fb.group<FormGroupType<IPatientInformation>>({
-        permissionToContact: fb.control<ContactPermission | null>(null, {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
-        patient: fb.group<FormGroupType<IPatientDetails>>({
-          title: fb.control<Title | null>(null, {
-            nonNullable: true,
-            validators: [],
-          }),
-          firstName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          lastName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          contactInformation: fb.group<FormGroupType<IContactInformation>>({
-            addressLine1: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            addressLine2: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            city: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            country: fb.control<Country | null>(null, {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            postalCode: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            state: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            telephone: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            emailAddress: fb.control<string>('', {
-              nonNullable: true,
-              validators: [
-                Validators.pattern(
-                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
-                ),
-              ],
-            }),
-          }),
-          isProductAvailable: fb.control<boolean | null>(null, {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          additionalContactInformation: fb.group<
-            FormGroupType<IContactInformation>
-          >({
-            addressLine1: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            addressLine2: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            city: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            country: fb.control<Country | null>(null, {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            postalCode: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            state: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            telephone: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            emailAddress: fb.control<string>('', {
-              nonNullable: true,
-              validators: [
-                Validators.required,
-                Validators.pattern(
-                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
-                ),
-              ],
-            }),
-          }),
-          dateOfBirth: fb.control<DateTime>(
-            DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
-            { nonNullable: true, validators: [] }
-          ),
-          ageAtComplaint: fb.control<string | null>(null, {
-            nonNullable: true,
-            validators: [],
-          }),
-        }),
-        awareOfComplaint: fb.control<PhysicianAwareness | null>(null, {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
-        permissionToContactHCP: fb.control<ContactPermissionHCP | null>(null, {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
-        hcp: fb.group<FormGroupType<IHCPDetails>>({
-          title: fb.control<Title | null>(null, {
-            nonNullable: true,
-            validators: [],
-          }),
-          firstName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          lastName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          contactInformation: fb.group<FormGroupType<IContactInformation>>({
-            addressLine1: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            addressLine2: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            city: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            country: fb.control<Country | null>(null, {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            postalCode: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            state: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            telephone: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            emailAddress: fb.control<string>('', {
-              nonNullable: true,
-              validators: [
-                Validators.pattern(
-                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
-                ),
-              ],
-            }),
-          }),
-        }),
-      }),
-
-      patientReporterInformation: fb.group<
-        FormGroupType<IPatientReporterInformation>
-      >({
-        permissionToContactReporter:
-          fb.control<ContactPermissionReporter | null>(null, {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-        patient: fb.group<FormGroupType<IPatientDetails>>({
-          title: fb.control<Title | null>(null, {
-            nonNullable: true,
-            validators: [],
-          }),
-          firstName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          lastName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          contactInformation: fb.group<FormGroupType<IContactInformation>>({
-            addressLine1: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            addressLine2: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            city: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            country: fb.control<Country | null>(null, {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            postalCode: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            state: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            telephone: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            emailAddress: fb.control<string>('', {
-              nonNullable: true,
-              validators: [
-                Validators.pattern(
-                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
-                ),
-              ],
-            }),
-          }),
-          isProductAvailable: fb.control<boolean | null>(null, {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          additionalContactInformation: fb.group<
-            FormGroupType<IContactInformation>
-          >({
-            addressLine1: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            addressLine2: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            city: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            country: fb.control<Country | null>(null, {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            postalCode: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            state: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            telephone: fb.control<string>('', {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            emailAddress: fb.control<string>('', {
-              nonNullable: true,
-              validators: [
-                Validators.required,
-                Validators.pattern(
-                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
-                ),
-              ],
-            }),
-          }),
-          dateOfBirth: fb.control<DateTime>(
-            DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
-            { nonNullable: true, validators: [] }
-          ),
-          ageAtComplaint: fb.control<string | null>(null, {
-            nonNullable: true,
-            validators: [],
-          }),
-        }),
-        reporter: fb.group<FormGroupType<IReporterDetails>>({
-          title: fb.control<Title | null>(null, {
-            nonNullable: true,
-            validators: [],
-          }),
-          firstName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          lastName: fb.control<string>('', {
-            nonNullable: true,
-            validators: [Validators.required],
-          }),
-          contactInformation: fb.group<FormGroupType<IContactInformation>>({
-            addressLine1: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            addressLine2: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            city: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            country: fb.control<Country | null>(null, {
-              nonNullable: true,
-              validators: [Validators.required],
-            }),
-            postalCode: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            state: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            telephone: fb.control<string>('', {
-              nonNullable: true,
-              validators: [],
-            }),
-            emailAddress: fb.control<string>('', {
-              nonNullable: true,
-              validators: [
-                Validators.pattern(
-                  '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$'
-                ),
-              ],
-            }),
-          }),
-        }),
-        facilityName: fb.control<string>('', {
-          nonNullable: true,
-          validators: [Validators.required],
-        }),
-        reporterAdministeredProduct: fb.control<ReporterAdministration | null>(
-          null,
-          { nonNullable: true, validators: [Validators.required] }
-        ),
-      }),
-    });
-  }
-
-  ngOnInit() {
-    const patientContactInfo = this.userDetailsFormGroup.get(
-      'patientInformation.patient.contactInformation'
+export class UserDetailsComponent implements OnInit, OnDestroy {
+    readonly UserTypes = UserTypes;
+    readonly titleOptions: string[] = Object.values(Title);
+    readonly countries: Country[] = Object.values(Country);
+    readonly permissionToContactValues: string[] =
+        Object.values(ContactPermission);
+    readonly permissionToContactHCPValues: string[] =
+        Object.values(ContactPermissionHCP);
+    readonly permissionToContactReporterValues: string[] = Object.values(
+        ContactPermissionReporter
     );
-    const patientReporterContactInfo = this.userDetailsFormGroup.get(
-      'patientReporterInformation.patient.contactInformation'
+    readonly physicianAwarenessValues: string[] =
+        Object.values(PhysicianAwareness);
+    readonly reporterAdministrationValues: string[] = Object.values(
+        ReporterAdministration
     );
 
-    if (patientContactInfo?.get('country')) {
-      this.countriesList = patientContactInfo
-        ?.get('country')
-        ?.valueChanges.pipe(
-          startWith(''),
-          map((value) => this._filter(value || ''))
-        );
-    } else if (patientReporterContactInfo?.get('country')) {
-      this.countriesList = patientReporterContactInfo
-        ?.get('country')
-        ?.valueChanges.pipe(
-          startWith(''),
-          map((value) => this._filter(value || ''))
-        );
+    @Input() complaintReportingFormGroup!: FormGroup<
+        FormGroupType<IComplaintReporting>
+    >;
+    @Input() products!: Product[];
+
+    countriesList?: Observable<string[]>;
+
+    private readonly destroy$ = new Subject<void>();
+    private _userDetailsFormGroup?: FormGroup<FormGroupType<IUserDetails>>;
+
+    @Input()
+    set form(formGroup: FormGroup) {
+        this._userDetailsFormGroup = formGroup;
     }
-  }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
+    get form(): FormGroup {
+        return this._userDetailsFormGroup as FormGroup;
+    }
 
-    return this.countries.filter((country) =>
-      country.toLowerCase().includes(filterValue)
-    );
-  }
+    constructor() {}
 
-  onPatientRadioChange(value: boolean) {
-    const patientContactInfo = this.userDetailsFormGroup.get(
-      'patientInformation.patient.contactInformation'
-    );
-    const contactFields = [
-      'addressLine1',
-      'city',
-      'postalCode',
-      'state',
-      'telephone',
-      'emailAddress',
-    ];
+    ngOnInit() {
+        if (!this.complaintReportingFormGroup.controls.userType) {
+            return;
+        }
+        // this.cdr.detectChanges();
+        const patientInformation = this.form.get("patientInformation");
+        const nonPatientInformation = this.form.get("nonPatientInformation");
 
-    contactFields.forEach((contact) => {
-      const control = patientContactInfo?.get(contact);
-      if (control) {
-        control.setValidators(value ? [Validators.required] : []);
-        control.updateValueAndValidity();
-      }
-    });
-  }
+        // const user = this.complaintReportingFormGroup.controls.userType.value;
 
-  onNonPatientReporterRadioChange(value: boolean) {
-    const patientReporterContactInfo = this.userDetailsFormGroup.get(
-      'patientReporterInformation.patient.contactInformation'
-    );
-    const contactFields = [
-      'addressLine1',
-      'city',
-      'postalCode',
-      'state',
-      'telephone',
-      'emailAddress',
-    ];
+        // if (user === UserTypes.Patient) {
+        //     // console.log(patientInformation);
+        //     patientInformation?.setValidators(Validators.required);
+        //     nonPatientInformation?.clearValidators();
+        // } else {
+        //     patientInformation?.clearValidators();
+        //     nonPatientInformation?.setValidators(Validators.required);
+        // }
+        // patientInformation?.updateValueAndValidity();
+        // nonPatientInformation?.updateValueAndValidity();
 
-    contactFields.forEach((contact) => {
-      const control = patientReporterContactInfo?.get(contact);
-      if (control) {
-        control.setValidators(value ? [Validators.required] : []);
-        control.updateValueAndValidity();
-      }
-    });
-  }
+        // this.complaintReportingFormGroup.controls.userType.valueChanges
+        //     .pipe(takeUntil(this.destroy$))
+        //     .subscribe((user) => {
+        //         if (user) {
+        //             this.form.reset();
+        //         }
+        //         // if (user === UserTypes.Patient) {
+        //         //     console.log(patientInformation);
+        //         //     patientInformation?.setValidators(Validators.required);
+        //         //     nonPatientInformation?.clearValidators();
+        //         // } else {
+        //         //     patientInformation?.clearValidators();
+        //         //     nonPatientInformation?.setValidators(
+        //         //         Validators.required
+        //         //     );
+        //         // }
+        //         // patientInformation?.updateValueAndValidity();
+        //         // nonPatientInformation?.updateValueAndValidity();
+        //     });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    onPatientRadioChange(value: boolean) {
+        const patientContactInfo = this.form.get(
+            "patientInformation.patient.contactInformation"
+        );
+        const contactFields = [
+            "addressLine1",
+            "city",
+            "postalCode",
+            "state",
+            "telephone",
+            "emailAddress"
+        ];
+
+        contactFields.forEach((contact) => {
+            const control = patientContactInfo?.get(contact);
+            if (control) {
+                control.setValidators(value ? [Validators.required] : []);
+                control.updateValueAndValidity();
+            }
+        });
+    }
+
+    onNonPatientReporterRadioChange(value: boolean) {
+        const patientReporterContactInfo = this.form.get(
+            "patientReporterInformation.patient.contactInformation"
+        );
+        const contactFields = [
+            "addressLine1",
+            "city",
+            "postalCode",
+            "state",
+            "telephone",
+            "emailAddress"
+        ];
+
+        contactFields.forEach((contact) => {
+            const control = patientReporterContactInfo?.get(contact);
+            if (control) {
+                control.setValidators(value ? [Validators.required] : []);
+                control.updateValueAndValidity();
+            }
+        });
+    }
 }

@@ -1,11 +1,23 @@
 <mat-toolbar class="fixed-top centered-container">
     <!-- <a [routerLink]="['', 'en']" class="text-decoration-none fs-4 ps-2">Event Reporting</a> -->
-    <a [routerLink]="['home']" class="text-decoration-none fs-4 ps-2 fw-bolder" style="color: #0a58ca"><span class="text-secondary fw-medium" style="font-weight: 500">Event</span> Reporting</a>
+    <a [routerLink]="['home']" class="text-decoration-none fs-4 ps-2 fw-bolder" style="color: #0a58ca"
+        ><span class="text-secondary fw-medium" style="font-weight: 500">Event</span> Reporting</a
+    >
     <span class="toolbar-spacer"></span>
     <!-- <img alt="Janssen logo" src="./assets/logo.png" /> -->
     <div class="d-flex gap-3" *ngIf="locale !== null">
-      <!-- <button *ngIf="locale.language" mat-stroked-button [routerLink]="['']">{{ locale.country }} - {{ locale.language }} <mat-icon iconPositionEnd>keyboard_arrow_down</mat-icon></button>
-      <button *ngIf="!locale.language" mat-stroked-button [routerLink]="['']">{{ locale.country }} <mat-icon iconPositionEnd>keyboard_arrow_down</mat-icon></button> -->
-      <button mat-raised-button color="primary" class="primary-btn">FAQ</button>
+        <!-- <button *ngIf="locale.language" mat-stroked-button [routerLink]="['']">
+            {{ locale.country }} - {{ locale.language }} <mat-icon iconPositionEnd>keyboard_arrow_down</mat-icon>
+        </button> -->
+        <button
+            *ngIf="locale?.country"
+            mat-stroked-button
+            (click)="redirectToLanguageSelectionPage()"
+            matTooltip="Changes to your country will result in data loss"
+            matTooltipPosition="below"
+        >
+            {{ locale?.country | uppercase }} <mat-icon iconPositionEnd>keyboard_arrow_down</mat-icon>
+        </button>
+        <button mat-raised-button color="primary" class="primary-btn">FAQ</button>
     </div>
 </mat-toolbar>

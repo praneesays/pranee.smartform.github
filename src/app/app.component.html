@@ -1,14 +1,11 @@
 <app-header class="centered-container"></app-header>
 <main class="centered-container">
-  <div
-    class="wizard-container d-flex position-relative h-100"
-    *ngIf="authorized$ | async; else notAuthorizedTemplate"
-  >
-    <div class="main-container p-4">
-      <router-outlet></router-outlet>
-    </div>
+    <div class="wizard-container d-flex position-relative h-100" *ngIf="authorized$ | async; else notAuthorizedTemplate">
+        <div class="main-container p-4">
+            <router-outlet></router-outlet>
+        </div>
 
-    <!-- <div
+        <!-- <div
       class="side-container bg-white h-100 ">
       <div *ngIf="isFormPage"
         class="progress-wrapper d-flex flex-column h-100"
@@ -38,7 +35,7 @@
         </div>
       </div>
     </div> -->
-  </div>
-  <ng-template #notAuthorizedTemplate> Not authorized </ng-template>
+    </div>
+    <ng-template #notAuthorizedTemplate> Not authorized </ng-template>
 </main>
 <app-footer class="centered-container"></app-footer>
