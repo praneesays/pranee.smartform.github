@@ -1,60 +1,17 @@
 {
-  "x-generator": "NSwag v13.18.2.0 (NJsonSchema v10.8.0.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
-    "title": "Smart Form Consumer API",
+    "title": "Smart Form Management API -- Public (v1)",
     "version": "v1"
   },
   "paths": {
-    "/api/v1/Image": {
-      "post": {
-        "tags": [
-          "Image"
-        ],
-        "operationId": "Image_CreateImage",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "Image": {
-                    "type": "string",
-                    "format": "binary",
-                    "nullable": true
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImageView"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Bearer": [
-              "api://e22c24f0-5be5-44c1-8636-477247e61e2a/user_impersonation"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/v1/Meta/deployment": {
+    "/api/public/v1/DeploymentVersion": {
       "get": {
         "tags": [
-          "Meta"
+          "DeploymentVersion"
         ],
-        "operationId": "Meta_GetDeploymentVersion",
+        "operationId": "DeploymentVersion_GetDeploymentVersion",
         "responses": {
           "200": {
             "description": "",
@@ -69,19 +26,373 @@
         }
       }
     },
-    "/api/v1/Meta/angular": {
+    "/api/public/v1/Image/{id}": {
       "get": {
         "tags": [
-          "Meta"
+          "Image"
         ],
-        "operationId": "Meta_GetAngularMetadata",
+        "operationId": "Image_GetImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/brands": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_GetBrands",
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AngularMetadata"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductBrandView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/brands/filter": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_FilterBrands",
+        "requestBody": {
+          "x-name": "filter",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductBrandsFilter"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductBrandView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/brands/{id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_GetBrand",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductBrandView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/brands/{id}/forms": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_GetFormsForBrand",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductFormView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/forms": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_GetForms",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductFormView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/forms/filter": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_FilterForms",
+        "requestBody": {
+          "x-name": "filter",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductFormsFilter"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductFormView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/forms/{id}": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_GetForm",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductFormView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/forms/{id}/brands": {
+      "post": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_GetBrandsForForm",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductBrandView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/Products/brands/{brandId}/forms/{formId}/strengths": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "operationId": "Products_GetStrengthsForBrandAndForm",
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "formId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductBrandFormStrengthView"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/ui-localization/strings": {
+      "get": {
+        "tags": [
+          "UiLocalization"
+        ],
+        "operationId": "UiLocalization_GetLocalizationStrings",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/v1/ui-localization/config": {
+      "get": {
+        "tags": [
+          "UiLocalization"
+        ],
+        "operationId": "UiLocalization_GetLocalizationConfig",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UiLocalizationConfiguration"
                 }
               }
             }
@@ -92,45 +403,15 @@
   },
   "components": {
     "schemas": {
-      "ImageView": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "createdByUserId",
-          "createdOn",
-          "updatedOn"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid",
-            "minLength": 1
-          },
-          "createdByUserId": {
-            "type": "string",
-            "minLength": 1
-          },
-          "createdOn": {
-            "type": "string",
-            "format": "date-time",
-            "minLength": 1
-          },
-          "updatedOn": {
-            "type": "string",
-            "format": "date-time",
-            "minLength": 1
-          }
-        }
-      },
       "DeploymentVersionWithEnvironment": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "fullSemanticVersion",
-          "buildMetadata",
+          "commitHash",
           "buildTimestamp",
           "branchName",
+          "buildNumber",
           "environmentName",
           "isProduction"
         ],
@@ -139,7 +420,7 @@
             "type": "string",
             "minLength": 1
           },
-          "buildMetadata": {
+          "commitHash": {
             "type": "string",
             "minLength": 1
           },
@@ -152,6 +433,10 @@
             "type": "string",
             "minLength": 1
           },
+          "buildNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
           "environmentName": {
             "type": "string",
             "minLength": 1
@@ -161,54 +446,254 @@
           }
         }
       },
-      "AngularMetadata": {
+      "ProductBrandView": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "activeDirectory",
-          "deploymentVersion",
-          "applicationInsightsInstrumentationKey"
+          "id",
+          "name"
         ],
         "properties": {
-          "activeDirectory": {
-            "$ref": "#/components/schemas/ActiveDirectoryClientMetadata"
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
           },
-          "deploymentVersion": {
-            "$ref": "#/components/schemas/DeploymentVersionWithEnvironment"
+          "name": {
+            "type": "string",
+            "minLength": 1
           },
-          "applicationInsightsInstrumentationKey": {
+          "primaryImageUrl": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "ProductBrandsFilter": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "formIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "ProductFormView": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "stages"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductFormStageView"
+            }
+          },
+          "primaryImageUrl": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "ProductFormStageView": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "productFormId",
+          "name",
+          "parts"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "productFormId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductFormStagePartView"
+            }
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "ProductFormStagePartView": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "productFormStageId",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "productFormStageId": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stageImageCoordinates": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProductFormsFilter": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "brandIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        }
+      },
+      "ProductBrandFormStrengthView": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "minLength": 1
+          },
+          "name": {
             "type": "string",
             "minLength": 1
           }
         }
       },
-      "ActiveDirectoryClientMetadata": {
+      "UiLocalizationConfiguration": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "clientId",
-          "tenant",
-          "authority",
-          "scopes"
+          "regions"
         ],
         "properties": {
-          "clientId": {
-            "type": "string",
-            "minLength": 1
-          },
-          "tenant": {
-            "type": "string",
-            "minLength": 1
-          },
-          "authority": {
-            "type": "string",
-            "minLength": 1
-          },
-          "scopes": {
+          "regions": {
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/UiLocalizationConfigurationRegion"
             }
+          }
+        }
+      },
+      "UiLocalizationConfigurationRegion": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "englishName",
+          "countries"
+        ],
+        "properties": {
+          "englishName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiLocalizationConfigurationCountry"
+            }
+          }
+        }
+      },
+      "UiLocalizationConfigurationCountry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "englishName",
+          "localizedName",
+          "languages"
+        ],
+        "properties": {
+          "englishName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "localizedName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UiLocalizationConfigurationCountryLanguage"
+            }
+          }
+        }
+      },
+      "UiLocalizationConfigurationCountryLanguage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "englishName",
+          "localizedName",
+          "localeCode"
+        ],
+        "properties": {
+          "englishName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "localizedName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "localeCode": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -242,19 +727,6 @@
           "/errors/sources/no-matching",
           "/errors/invalid-json-file-expression"
         ]
-      }
-    },
-    "securitySchemes": {
-      "Bearer": {
-        "type": "oauth2",
-        "flows": {
-          "implicit": {
-            "authorizationUrl": "https://login.microsoftonline.com/3ac94b33-9135-4821-9502-eafda6592a35/oauth2/v2.0/authorize",
-            "scopes": {
-              "api://e22c24f0-5be5-44c1-8636-477247e61e2a/user_impersonation": "api://e22c24f0-5be5-44c1-8636-477247e61e2a/user_impersonation"
-            }
-          }
-        }
       }
     }
   }

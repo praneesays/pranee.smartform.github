@@ -1,6 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit, forwardRef } from "@angular/core";
 import {
     ControlValueAccessor,
+    FormControl,
     FormGroup,
     FormGroupDirective,
     NG_VALUE_ACCESSOR
@@ -16,7 +17,7 @@ import { Title } from "src/app/types";
         {
             provide: NG_VALUE_ACCESSOR,
             multi: true,
-            useExisting: PersonNameComponent
+            useExisting: forwardRef(() => PersonNameComponent)
         }
     ]
 })
@@ -27,17 +28,28 @@ export class PersonNameComponent
 
     form!: FormGroup;
     @Input() controlName!: string;
-
+    nameControl: FormControl = new FormControl();
     private readonly destroy$ = new Subject<void>();
 
     constructor(private rootFormGroup: FormGroupDirective) {}
 
     onTouched = () => {};
+    onChange: any = () => {};
 
     ngOnInit(): void {
         this.form = this.rootFormGroup.control.get(
             this.controlName
         ) as FormGroup;
+        // this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        //     console.log(this.form.value);
+        //     this.onChange(this.form.value);
+        // });
+        // this.nameControl.valueChanges
+        //     .pipe(takeUntil(this.destroy$))
+        //     .subscribe((value) => {
+        //         console.log(value);
+        //         this.onChange(value);
+        //     });
     }
 
     ngOnDestroy() {
@@ -47,7 +59,7 @@ export class PersonNameComponent
 
     writeValue(value: any) {
         if (value) {
-            this.form.setValue(value);
+            this.nameControl.setValue(value);
         }
     }
 
@@ -56,9 +68,10 @@ export class PersonNameComponent
     }
 
     registerOnChange(onChange: any) {
-        this.form.valueChanges
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(onChange);
+        this.onChange = onChange;
+        // this.form.valueChanges
+        //     .pipe(takeUntil(this.destroy$))
+        //     .subscribe(onChange);
     }
 
     setDisabledState?(isDisabled: boolean) {

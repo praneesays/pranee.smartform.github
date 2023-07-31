@@ -7,7 +7,8 @@ import { Component, Input } from "@angular/core";
 })
 export class ReviewComponent {
     @Input() complaintSubmitted!: boolean;
-    @Input() formControls: any;
+    @Input() step1FormControls: any;
+    @Input() step2FormControls: any;
 
     privacyPolicyChecked = false;
 

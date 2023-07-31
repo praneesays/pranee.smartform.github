@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormGroup, FormGroupDirective } from "@angular/forms";
-import { Observable, map, startWith } from "rxjs";
+import { map, Observable, startWith } from "rxjs";
 import { Country } from "src/app/types";
 
 @Component({
@@ -12,11 +12,11 @@ export class ContactInformationComponent implements OnInit {
     readonly countries: Country[] = Object.values(Country);
     // @Input() formGroup!: FormGroup;
 
-    form!: FormGroup;
+    form?: FormGroup;
     countriesList?: Observable<string[]>;
 
-    @Input() parentForm!: FormGroup;
-    @Input() controlName!: string;
+    @Input() parentForm?: FormGroup;
+    @Input() controlName?: string;
 
     constructor(private rootFormGroup: FormGroupDirective) {}
 
@@ -25,6 +25,10 @@ export class ContactInformationComponent implements OnInit {
     // }
 
     ngOnInit() {
+        if (!this.controlName) {
+            throw new Error("Not implemented!");
+        }
+
         this.form = this.rootFormGroup.control.get(
             this.controlName
         ) as FormGroup;

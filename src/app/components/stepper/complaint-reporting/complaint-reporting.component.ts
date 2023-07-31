@@ -1,225 +1,420 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, forwardRef, OnDestroy } from "@angular/core";
 import {
-    FormGroup,
-    FormBuilder,
-    Validators,
+    AbstractControl,
+    ControlValueAccessor,
     FormControl,
-    AbstractControl
+    FormGroup,
+    NG_VALUE_ACCESSOR,
+    Validators
 } from "@angular/forms";
-import { startWith, map, Observable, takeUntil, Subject } from "rxjs";
-import {
-    IComplaintReporting,
-    UserTypes,
-    ReturnOption,
-    Country,
-    Brand,
-    Product
-} from "src/app/types";
-import { Question } from "src/app/questions";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { IProductBrandFormStrengthView } from "@generated-api-clients";
+import {
+    map,
+    Observable,
+    of,
+    startWith,
+    Subject,
+    switchMap,
+    takeUntil,
+    tap
+} from "rxjs";
+import { ProductsApiService } from "src/app/api/products-api.service";
 import { LotNumberHelpBottomSheetComponent } from "src/app/bottom-sheets/lot-number-help-bottom-sheet/lot-number-help-bottom-sheet.component";
-import { FormGroupType } from "../stepper.component";
+import {
+    BatchOrLotNumberUnavailableReason,
+    Country,
+    IBrandFormSelection,
+    IComplaintReporting,
+    ReturnOption,
+    UserTypes
+} from "src/app/types";
+import { observeFormControlValue } from "src/app/utilities/rxjs-utils";
+
+export interface IImageDimensions {
+    name: string;
+    dataUrl: string;
+    width: number;
+    height: number;
+}
+
+export interface IImageHotspot {
+    value: string;
+    x: number;
+    y: number;
+    radius: number;
+    mark: string;
+    nextQuestionId: string;
+}
+
+export interface IImageData {
+    imageWithDimensions: IImageDimensions;
+    hotspots: IImageHotspot[];
+}
+
+// const imageData: IImageData[] = [
+//     {
+//         imageWithDimensions: {
+//             name: "Image 1",
+//             dataUrl: "./assets/Autoinjector.png",
+//             width: 750,
+//             height: 134
+//         },
+//         hotspots: [
+//             {
+//                 value: "Activation Button",
+//                 x: 291,
+//                 y: 65,
+//                 radius: 15,
+//                 mark: "6",
+//                 nextQuestionId: "needle_damage_type"
+//             },
+//             {
+//                 value: "Expiration Date",
+//                 x: 30,
+//                 y: 84,
+//                 radius: 15,
+//                 mark: "7",
+//                 nextQuestionId: "who_administered"
+//             },
+//             {
+//                 value: "Thin hidden needle",
+//                 x: 568,
+//                 y: 66,
+//                 radius: 15,
+//                 mark: "4",
+//                 nextQuestionId: "who_administered"
+//             },
+//             {
+//                 value: "Green Safety Sleeve",
+//                 x: 507,
+//                 y: 62,
+//                 radius: 15,
+//                 mark: "3",
+//                 nextQuestionId: "button_stuck"
+//             },
+//             {
+//                 value: "Tamper Evident Seal",
+//                 x: 422,
+//                 y: 59,
+//                 radius: 15,
+//                 mark: "2",
+//                 nextQuestionId: "who_administered"
+//             }
+//         ]
+//     }
+// ];
 
 @Component({
     selector: "app-complaint-reporting",
     templateUrl: "./complaint-reporting.component.html",
-    styleUrls: ["./complaint-reporting.component.scss"]
+    styleUrls: ["./complaint-reporting.component.scss"],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => ComplaintReportingComponent),
+            multi: true
+        }
+    ]
 })
-export class ComplaintReportingComponent implements OnInit, OnDestroy {
+export class ComplaintReportingComponent
+    implements ControlValueAccessor, OnDestroy
+{
     readonly UserTypes = UserTypes;
     readonly userTypeValues: string[] = Object.values(UserTypes);
     readonly returnOptionValues: string[] = Object.values(ReturnOption);
+    readonly batchOrLotNumberUnavailableReasonValues: string[] = Object.values(
+        BatchOrLotNumberUnavailableReason
+    );
     readonly countries: Country[] = Object.values(Country);
 
-    @Input() form!: FormGroup<FormGroupType<IComplaintReporting>>;
-    @Input() products!: Product[];
+    countriesList$?: Observable<string[]>;
+    // imageHotspotValues: Question[] = [];
 
-    countriesList?: Observable<string[]>;
-    imageHotspotValues: Question[] = [];
-    filteredProducts: Product[] = this.products;
-    filteredBrands: Brand[] = [];
-    showAllProducts: boolean = true;
-    selectedProductIndex: number = -1;
-    selectedBrand: string = "";
+    readonly selectedProductStrengths$: Observable<
+        readonly IProductBrandFormStrengthView[]
+    >;
+    loadingSelectedProductStrengths = false;
 
-    newImageHotspotValues: Question[] = [];
+    readonly hasSelectedBrandAndForm$: Observable<boolean>;
+
+    readonly formGroup = new FormGroup({
+        userType: new FormControl<UserTypes | null>(null, {
+            validators: [Validators.required]
+        }),
+        purchasedCountry: new FormControl<Country | null>(null, {
+            validators: [Validators.required]
+        }),
+        brandAndForm: new FormControl<IBrandFormSelection | null>(null, {
+            validators: [Validators.required]
+        }),
+        strengthId: new FormControl<string | null>(null, {
+            validators: [Validators.required]
+        }),
+        returnOption: new FormControl<ReturnOption | null>(null, {
+            validators: [Validators.required]
+        }),
+        hasBatchOrLotNumber: new FormControl<boolean | null>(null, {
+            validators: [Validators.required]
+        }),
+        batchOrLotNumber: new FormControl<string | null>(null, {
+            validators: [Validators.required]
+        }),
+        batchOrLotNumberUnavailableReason:
+            new FormControl<BatchOrLotNumberUnavailableReason | null>(null, {
+                validators: [Validators.required]
+            }),
+        gtin: new FormControl<string | null>(null, {
+            validators: []
+        }),
+        serial: new FormControl<string | null>(null, {
+            validators: []
+        }),
+        hcp: new FormGroup({
+            reportedFromJNJProgram: new FormControl<boolean | null>(null, {
+                validators: []
+            }),
+            studyProgram: new FormControl<string | null>(null, {
+                validators: []
+            }),
+            siteNumber: new FormControl<number | null>(null, {
+                nonNullable: true,
+                validators: []
+            }),
+            subjectNumber: new FormControl<number | null>(null, {
+                validators: []
+            })
+        })
+    });
+
+    privacyPolicy = "https://www.janssen.com/privacy-policy";
 
     private readonly destroy$ = new Subject<void>();
+    private onTouched?: () => void;
+    private onChange?: (val: IComplaintReporting | null) => void;
 
-    constructor(private readonly bottomSheet: MatBottomSheet) {
-        this.imageHotspotValues = [
-            {
-                id: "simponi_device_failure_location",
-                type: "image-map",
-                required: true,
-                questionText: "",
-                imageUrl:
-                    "https://www.simponihcp.com/sites/www.simponihcp.com/files/injection_experience_autoinjector_desktop_1.png",
-                areas: [
-                    {
-                        value: "Hidden Needle",
+    constructor(
+        private readonly bottomSheet: MatBottomSheet,
+        productsApiService: ProductsApiService
+    ) {
+        observeFormControlValue<boolean | null>(
+            this.formGroup.controls.hasBatchOrLotNumber
+        )
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((hasBatchOrLotNumber) => {
+                if (hasBatchOrLotNumber === null) {
+                    this.formGroup.controls.batchOrLotNumber.disable();
+                    this.formGroup.controls.batchOrLotNumberUnavailableReason.disable();
 
-                        x: 394,
-                        y: 283,
-                        radius: 22,
+                    return;
+                }
 
-                        nextQuestionId: "needle_damage_type"
-                    },
-                    {
-                        value: "Safety Sleeve",
+                if (hasBatchOrLotNumber) {
+                    this.formGroup.controls.batchOrLotNumber.enable();
+                    this.formGroup.controls.batchOrLotNumberUnavailableReason.disable();
+                } else {
+                    this.formGroup.controls.batchOrLotNumber.disable();
+                    this.formGroup.controls.batchOrLotNumberUnavailableReason.enable();
+                }
+            });
 
-                        x: 440,
-                        y: 253,
-                        radius: 22,
+        // this.imageHotspotValues = [
+        //     {
+        //         id: "simponi_autoinjector",
+        //         type: "image-map",
+        //         required: true,
+        //         questionText: "Image 1",
+        //         imageUrl: "./assets/Autoinjector.png",
+        //         areas: [
+        //             {
+        //                 value: "Activation Button",
+        //                 x: 291,
+        //                 y: 65,
+        //                 radius: 15,
+        //                 mark: "6",
+        //                 nextQuestionId: "needle_damage_type"
+        //             },
+        //             {
+        //                 value: "Expiration Date",
+        //                 x: 30,
+        //                 y: 84,
+        //                 radius: 15,
+        //                 mark: "7",
+        //                 nextQuestionId: "who_administered"
+        //             },
+        //             {
+        //                 value: "Thin hidden needle",
+        //                 x: 568,
+        //                 y: 66,
+        //                 radius: 15,
+        //                 mark: "4",
+        //                 nextQuestionId: "who_administered"
+        //             },
+        //             {
+        //                 value: "Green Safety Sleeve",
+        //                 x: 507,
+        //                 y: 62,
+        //                 radius: 15,
+        //                 mark: "3",
+        //                 nextQuestionId: "button_stuck"
+        //             },
+        //             {
+        //                 value: "Tamper Evident Seal",
+        //                 x: 422,
+        //                 y: 59,
+        //                 radius: 15,
+        //                 mark: "2",
+        //                 nextQuestionId: "who_administered"
+        //             }
+        //         ]
+        //     },
+        //     {
+        //         id: "pfs_before",
+        //         type: "image-map",
+        //         required: true,
+        //         questionText: "Image 2",
+        //         imageUrl: "./assets/PFS-before1.jpg",
+        //         areas: [
+        //             {
+        //                 value: "Cap",
+        //                 x: 41.328125,
+        //                 y: 21,
+        //                 radius: 15,
+        //                 mark: "1",
+        //                 nextQuestionId: "who_administered"
+        //             },
+        //             {
+        //                 value: "Green Safety Sleeve",
+        //                 x: 34.328125,
+        //                 y: 166,
+        //                 radius: 15,
+        //                 mark: "3",
+        //                 nextQuestionId: "button_stuck"
+        //             },
+        //             {
+        //                 value: "Viewing Window",
+        //                 x: 35.328125,
+        //                 y: 266,
+        //                 radius: 15,
+        //                 mark: "5",
+        //                 nextQuestionId: "who_administered"
+        //             },
+        //             {
+        //                 value: "Expiration Date",
+        //                 x: 33.328125,
+        //                 y: 360,
+        //                 radius: 15,
+        //                 mark: "7",
+        //                 nextQuestionId: "needle_damage_type"
+        //             }
+        //         ]
+        //     }
+        // ];
 
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Tamper-Evident Seal",
+        const brandAndForm$ =
+            observeFormControlValue<IBrandFormSelection | null>(
+                this.formGroup.controls.brandAndForm
+            );
 
-                        x: 545,
-                        y: 317,
-                        radius: 22,
+        this.selectedProductStrengths$ = brandAndForm$.pipe(
+            tap(() => {
+                this.loadingSelectedProductStrengths = true;
+                this.selectedProductStrengthControl.disable();
+                this.selectedProductStrengthControl.setValue(null);
+            }),
+            switchMap((c) =>
+                !c
+                    ? of([])
+                    : productsApiService.getStrengthsForBrandAndForm(
+                          c.brandId,
+                          c.formId
+                      )
+            ),
+            tap((c) => {
+                this.loadingSelectedProductStrengths = false;
 
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Large Viewing Window",
+                if (c.length > 0) {
+                    this.selectedProductStrengthControl.enable();
+                }
+            })
+        );
 
-                        x: 625,
-                        y: 250,
-                        radius: 22,
+        this.hasSelectedBrandAndForm$ = brandAndForm$.pipe(map((c) => !!c));
 
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Activation Button",
-
-                        x: 750,
-                        y: 236,
-                        radius: 22,
-
-                        nextQuestionId: "button_stuck"
-                    },
-                    {
-                        value: "Easy-to-Grip Shape",
-
-                        x: 927,
-                        y: 300,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Expiration Date",
-
-                        x: 1055,
-                        y: 328,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
+        observeFormControlValue(this.formGroup)
+            .pipe(
+                map((c): IComplaintReporting | null => {
+                    if (!c) {
+                        return null;
                     }
-                ]
-            }
-        ];
 
-        this.newImageHotspotValues = [
-            {
-                id: "simponi_autoinjector",
-                type: "image-map",
-                required: true,
-                questionText: "",
-                imageUrl: "../../../../assets/Autoinjector.png",
-                areas: [
-                    {
-                        value: "Hidden Needle",
-
-                        x: 394,
-                        y: 283,
-                        radius: 22,
-
-                        nextQuestionId: "needle_damage_type"
-                    },
-                    {
-                        value: "Safety Sleeve",
-
-                        x: 440,
-                        y: 253,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Tamper-Evident Seal",
-
-                        x: 545,
-                        y: 317,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Large Viewing Window",
-
-                        x: 625,
-                        y: 250,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Activation Button",
-
-                        x: 750,
-                        y: 236,
-                        radius: 22,
-
-                        nextQuestionId: "button_stuck"
-                    },
-                    {
-                        value: "Easy-to-Grip Shape",
-
-                        x: 927,
-                        y: 300,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Expiration Date",
-
-                        x: 1055,
-                        y: 328,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
+                    if (
+                        !c.userType ||
+                        !c.brandAndForm ||
+                        !c.purchasedCountry ||
+                        !c.returnOption ||
+                        !c.hcp
+                    ) {
+                        return null;
                     }
-                ]
-            }
-        ];
-    }
 
-    ngOnInit() {
-        if (this.form.controls?.["purchasedCountry"]) {
-            this.countriesList = this.form.controls?.[
-                "purchasedCountry"
-            ].valueChanges.pipe(
+                    return {
+                        brandAndForm: c.brandAndForm,
+                        hasBatchOrLotNumber: c.hasBatchOrLotNumber ?? false,
+                        purchasedCountry: c.purchasedCountry,
+                        returnOption: c.returnOption,
+                        strengthId: c.strengthId ?? null,
+                        userType: c.userType,
+                        batchOrLotNumber: c.batchOrLotNumber ?? null,
+                        batchOrLotNumberUnavailableReason:
+                            c.batchOrLotNumberUnavailableReason ?? null,
+                        gtin: c.gtin ?? null,
+                        serial: c.serial ?? null,
+                        hcp: {
+                            reportedFromJNJProgram:
+                                c.hcp.reportedFromJNJProgram ?? null,
+                            siteNumber: c.hcp.siteNumber ?? null,
+                            studyProgram: c.hcp.studyProgram ?? null,
+                            subjectNumber: c.hcp.subjectNumber ?? null
+                        }
+                    };
+                }),
+                takeUntil(this.destroy$)
+            )
+            .subscribe((c) => {
+                const onChange = this.onChange;
+
+                if (!onChange) {
+                    return;
+                }
+
+                onChange(c);
+            });
+
+        this.countriesList$ =
+            this.formGroup.controls.purchasedCountry.valueChanges.pipe(
                 startWith(""),
                 map((value) => this._filter(value || ""))
             );
-        }
 
-        this.products.forEach((product) => {
-            this.filteredBrands =
-                product.name === "Unknown" ? product.brands : [];
-            this.sortBrands(product.brands);
-        });
+        // languageService.selectedLocale$
+        // .pipe(takeUntil(this.destroy$))
+        // .subscribe((locale) => {
+        //     this.privacyPolicy = locale?.privacyPolicy;
+        // });
     }
 
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
     }
+
+    // onProductImageChange(question: Question) {
+    //     if (this.selectedProduct) {
+    //         delete this.selectedProduct;
+    //     }
+    //     this.selectedProduct = question;
+    // }
 
     onUserTypeChange(value: string) {
         if (value === UserTypes.HealthcareProfessional) {
@@ -228,55 +423,6 @@ export class ComplaintReportingComponent implements OnInit, OnDestroy {
             this.clearHcpFormGroup();
         }
         this.hcpFormGroup.updateValueAndValidity();
-    }
-
-    onProductSelectionChange(index: number): void {
-        this.selectedBrandControl.setValue(null);
-        this.selectedProductIndex = index;
-        this.showAllProducts = false;
-    }
-
-    toggleProducts() {
-        this.showAllProducts = !this.showAllProducts;
-    }
-
-    filterbrands(filter: string, productName: string) {
-        const productList = this.products.find(
-            (product) => product.name == productName
-        );
-
-        if (productList) {
-            if (productName === "Unknown") {
-                this.filteredBrands = productList.brands.filter((brand) =>
-                    filter
-                        ? brand.name.charAt(0).toUpperCase() >=
-                              filter.charAt(0).toUpperCase() &&
-                          brand.name.charAt(0).toUpperCase() <=
-                              filter.charAt(2).toUpperCase()
-                        : true
-                );
-            } else {
-                this.filteredBrands = productList.brands;
-            }
-        }
-        this.sortBrands(this.filteredBrands);
-        this.selectedBrand = filter;
-    }
-
-    sortBrands(brands: Brand[]) {
-        brands.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    onBrandSelectionChange(brandName: string): void {
-        this.selectedBrandControl.setValue(brandName);
-        // this.scrollToStrengthSection();
-        this.filteredProducts = this.products.filter(
-            (product) =>
-                product.brands.some(
-                    (brand) =>
-                        brand.name.toLowerCase() === brandName.toLowerCase()
-                ) && product.name !== "Unknown"
-        );
     }
 
     showLotNumberHelp() {
@@ -308,8 +454,9 @@ export class ComplaintReportingComponent implements OnInit, OnDestroy {
     // }
 
     handleBatchLotNumberChange(value: boolean) {
-        const batchLotNumber = this.form.get("batchLotNumber");
-        const noReason = this.form?.get("noReason");
+        const batchLotNumber = this.formGroup.controls.batchOrLotNumber;
+        const noReason =
+            this.formGroup.controls.batchOrLotNumberUnavailableReason;
 
         if (!batchLotNumber) {
             return;
@@ -343,16 +490,48 @@ export class ComplaintReportingComponent implements OnInit, OnDestroy {
         control?.updateValueAndValidity();
     }
 
-    get selectedProductControl(): FormControl {
-        return this.form.get("product") as FormControl;
+    writeValue(obj: IComplaintReporting | null): void {
+        this.formGroup.setValue({
+            userType: obj?.userType ?? null,
+            purchasedCountry: obj?.purchasedCountry ?? null,
+            brandAndForm: obj?.brandAndForm ?? null,
+            strengthId: obj?.strengthId ?? null,
+            returnOption: obj?.returnOption ?? null,
+            hasBatchOrLotNumber: obj?.hasBatchOrLotNumber ?? null,
+            batchOrLotNumber: obj?.batchOrLotNumber ?? null,
+            batchOrLotNumberUnavailableReason:
+                obj?.batchOrLotNumberUnavailableReason ?? null,
+            gtin: obj?.gtin ?? null,
+            serial: obj?.serial ?? null,
+            hcp: {
+                reportedFromJNJProgram:
+                    obj?.hcp?.reportedFromJNJProgram ?? null,
+                studyProgram: obj?.hcp?.studyProgram ?? null,
+                siteNumber: obj?.hcp?.siteNumber ?? null,
+                subjectNumber: obj?.hcp?.subjectNumber ?? null
+            }
+        });
+    }
+    registerOnChange(fn: (val: IComplaintReporting | null) => void): void {
+        this.onChange = fn;
+    }
+    registerOnTouched(fn: () => void): void {
+        this.onTouched = fn;
+    }
+    setDisabledState(isDisabled: boolean): void {
+        if (isDisabled) {
+            this.formGroup.disable();
+        } else {
+            this.formGroup.enable();
+        }
     }
 
-    get selectedBrandControl(): FormControl {
-        return this.form.get("brand") as FormControl;
+    get selectedProductStrengthControl() {
+        return this.formGroup.controls.strengthId;
     }
 
     get hcpFormGroup() {
-        return this.form.get("hcp") as FormGroup;
+        return this.formGroup.controls.hcp;
     }
 
     private initializeHcpFormGroup() {

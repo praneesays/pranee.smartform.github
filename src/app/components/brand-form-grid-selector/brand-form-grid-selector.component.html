@@ -1,0 +1,104 @@
+<ng-container [formGroup]="formGroup">
+    <div class="products_section vertical-tabs-section">
+        <h2 class="primary-text-color font-medium mb-0">Report an event for the following product</h2>
+        <p class="mb-3 lh-base">
+            Please note that the product pictures displayed are for illustrative purposes only. The color and appearance of the actual product may
+            differ in your location.
+        </p>
+
+        <div class="d-flex flex-wrap gap-2 gap-md-4 justify-content-between justify-content-md-start mx-2 my-2 align-items-end">
+            <ng-container *ngFor="let form of allProductForms$ | async" data-test-key="form-item">
+                <label *ngIf="showAllProductForms || primaryProductFormControl.value === form.id">
+                    <input type="radio" name="primaryFormId" [value]="form.name" formControlName="primaryFormId" class="mb-2" />
+                    <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                        <div class="image-section">
+                            <img class="position-relative" [ngSrc]="form.primaryImageUrl ?? '/assets/unknown.png'" fill [alt]="form.name" />
+                        </div>
+                        <div class="image-caption fw-semibold w-100 py-2 text-center">
+                            {{ form.name }}
+                        </div>
+                    </div>
+                </label>
+            </ng-container>
+            <label *ngIf="showAllProductForms || primaryProductFormControl.value === UNKNOWN" data-test-key="form-item">
+                <input type="radio" name="primaryFormId" [value]="UNKNOWN" formControlName="primaryFormId" class="mb-2" />
+                <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                    <div class="image-section">
+                        <img class="position-relative" ngSrc="/assets/unknown.png" fill alt="Unknown" />
+                    </div>
+                    <div class="image-caption fw-semibold w-100 py-2 text-center">Unknown</div>
+                </div>
+            </label>
+            <button mat-stroked-button color="secondary" (click)="toggleProducts()" *ngIf="primaryProductFormControl.value">
+                {{ showAllProductForms ? "Hide other Products" : "Show all Products" }}
+            </button>
+        </div>
+    </div>
+
+    <ng-container *ngIf="primaryProductFormControl.value">
+        <div class="brands_section" #brandsSection>
+            <div class="vertical-tabs-section my-3">
+                <h2 class="primary-text-color font-medium mb-0">Select a brand below</h2>
+                <ng-container>
+                    <div class="d-flex flex-column mx-0 mx-md-2 my-2">
+                        <div class="filter-section d-flex flex-column gap-3" *ngIf="primaryProductFormControl.value === UNKNOWN">
+                            <div class="d-flex align-items-center gap-3">
+                                <h3 class="fw-semibold mb-0 lh-base fs-6 text-secondary-emphasis">Filter:</h3>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button
+                                        *ngFor="let range of letterRanges"
+                                        mat-stroked-button
+                                        color="secondary"
+                                        (click)="brandAlphaFilter = range"
+                                        [class.active]="brandAlphaFilter === range"
+                                        [disabled]="range.hasNone$ | async"
+                                    >
+                                        {{ range.name }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-4 justify-content-between justify-content-md-start mx-2 my-2 align-items-end">
+                            <ng-container *ngIf="filteredProductBrands$ | async as filteredProductBrands">
+                                <label *ngFor="let brand of filteredProductBrands">
+                                    <input type="radio" name="brandId" [value]="brand.id" formControlName="brandId" class="mb-2" />
+                                    <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                                        <div class="image-section">
+                                            <img
+                                                class="position-relative"
+                                                [ngSrc]="brand.primaryImageUrl ?? '/assets/unknown.png'"
+                                                fill
+                                                [alt]="brand.name"
+                                            />
+                                        </div>
+                                    </div>
+                                </label>
+                            </ng-container>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="primaryProductFormControl.value === UNKNOWN && productBrandControl.value">
+        <div class="products_section vertical-tabs-section">
+            <h2 class="primary-text-color font-medium mb-0">Select a Product below</h2>
+            <div class="d-flex flex-wrap gap-4 justify-content-between justify-content-md-start mx-2 my-2 align-items-end">
+                <ng-container *ngFor="let form of secondaryProductFormOptions$ | async">
+                    <label>
+                        <input type="radio" name="secondaryFormId" [value]="form.id" formControlName="secondaryFormId" class="mb-2" />
+                        <div class="product-section d-flex flex-column align-items-center justify-content-center rounded-3">
+                            <div class="image-section">
+                                <img class="position-relative" [ngSrc]="form.primaryImageUrl ?? '/assets/unknown.png'" fill [alt]="form.name" />
+                            </div>
+                            <div class="image-caption fw-semibold w-100 py-2 text-center">
+                                {{ form.name }}
+                            </div>
+                        </div>
+                    </label>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+</ng-container>

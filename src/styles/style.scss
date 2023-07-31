@@ -1,7 +1,10 @@
 @import "variables";
+@import "fonts";
+
+@import "~@ng-select/ng-select/themes/material.theme.css";
 
 :host {
-    font-family: $default-font-family;
+    /* font-family: $default-font-family; */
     font-size: $medium-font-size;
     color: #333;
     box-sizing: border-box;
@@ -10,14 +13,18 @@
 }
 
 * {
-    font-family: $default-font-family;
+    /* font-family: $default-font-family; */
+    font-family: "KarbonRegular", sans-serif;
 }
 
 html,
 body {
     height: 100%;
-    // background-color: $bg-color;
-    background-color: #f4f3f6;
+    /* background-color: $bg-color; */
+    /* background-color: #f4f3f6; */
+    background-color: #f2f2f2;
+    /* font-family: Georgia, sans-serif; */
+    font-family: "KarbonRegular", sans-serif;
 }
 
 body {
@@ -31,8 +38,13 @@ body {
     background-color: $bg-color;
 }
 
+.primary-color-text {
+    color: $primary-color;
+}
+
 .default-fontSize {
-    font-family: $default-font-family;
+    /* font-family: $default-font-family; */
+    font-family: "KarbonRegular", sans-serif;
 }
 
 .primary-icon-buttoon {
@@ -55,6 +67,10 @@ body {
     margin: 0 auto;
 }
 
+.text-wrap-balance {
+    text-wrap: balance;
+}
+
 .bgdrop {
     backdrop-filter: blur(8px);
 }
@@ -63,11 +79,33 @@ body {
     cursor: pointer;
 }
 
+h2 {
+    font-family: "KarbonBold", sans-serif !important;
+}
+
+.primary-text-color {
+    color: $primary-color;
+}
+
+.secondary-text-color {
+    color: $secondary-color;
+}
+
+.font-medium {
+    font-family: "KarbonMedium", sans-serif !important;
+}
+
 .primary-btn {
-    background-color: $primary-color !important;
+    background-color: $btn-primary-color !important;
+    font-family: "KarbonMedium", sans-serif;
+    font-size: 1rem;
+
+    span {
+        font-family: "KarbonMedium", sans-serif;
+    }
 
     &:hover {
-        background-color: $hover-color !important;
+        background-color: $btn-hover-color !important;
     }
 
     &:disabled {
@@ -75,6 +113,30 @@ body {
 
         &:hover {
             background-color: rgba(0, 0, 0, 0.12) !important;
+        }
+    }
+}
+
+.ng-select {
+    .ng-select-container.ng-appearance-outline {
+        .ng-placeholder,
+        .ng-value {
+            padding: 0.4rem 0.25em;
+            font-size: 16px;
+        }
+    }
+}
+
+.mat-step-header {
+    .mat-step-icon-selected {
+        background-color: $primary-color;
+    }
+}
+
+.mat-mdc-standard-chip {
+    &.mat-primary {
+        &.mat-mdc-chip-selected {
+            background-color: $primary-color;
         }
     }
 }

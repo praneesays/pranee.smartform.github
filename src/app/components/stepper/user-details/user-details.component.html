@@ -1,18 +1,34 @@
-<form [formGroup]="form" class="w-100 h-100 d-flex flex-column gap-2">
-    <ng-template matStepLabel>User Details</ng-template>
+<form [formGroup]="formGroup" class="w-100 h-100 d-flex flex-column gap-2">
+    <ng-template matStepLabel>Contact Information</ng-template>
     <div class="flex-grow-1 bg-white rounded-3 shadow px-3 px-sm-5 py-3 mt-2">
-        <div *ngIf="complaintReportingFormGroup.controls?.['userType']?.value === UserTypes.Patient" class="mt-2">
-            <ng-container *ngIf="form.get('patientInformation')">
-                <h2>PATIENT INFORMATION</h2>
+        <div *ngIf="complaintReportingFormValues?.userType === UserTypes.Patient" class="mt-2">
+            <ng-container *ngIf="formGroup.get('patientInformation')">
+                <h2 class="primary-text-color font-medium mb-0">PATIENT INFORMATION</h2>
 
                 <div formGroupName="patientInformation">
-                    <div>
+                    <!-- <div>
                         <mat-form-field class="default-control-width mb-2" appearance="outline">
                             <mat-label>Does J & J have permission to contact you about this report?</mat-label>
                             <mat-select formControlName="permissionToContact">
                                 <mat-option *ngFor="let option of permissionToContactValues" [value]="option">{{ option }}</mat-option>
                             </mat-select>
                         </mat-form-field>
+                    </div> -->
+
+                    <div class="form-group">
+                        <label for="permissionToContact" class="mb-2 fs-6">Does J & J have permission to contact you about this report?</label>
+                        <ng-select
+                            [selectOnTab]="true"
+                            labelForId="permissionToContact"
+                            formControlName="permissionToContact"
+                            placeholder="Select an option"
+                            aria-label="Permission to Contact"
+                            class="form-floating"
+                            appearance="outline"
+                            appendTo="body"
+                        >
+                            <ng-option *ngFor="let option of permissionToContactValues" [value]="option">{{ option }}</ng-option>
+                        </ng-select>
                     </div>
 
                     <div formGroupName="patient">
@@ -20,7 +36,7 @@
 
                         <app-contact-information controlName="patientInformation.patient.contactInformation"></app-contact-information>
 
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-sm-12 col-lg-6">
                                 <mat-form-field class="default-control-width mb-2" appearance="outline" shouldLabelFloat="false">
                                     <mat-label>Date of Birth</mat-label>
@@ -38,7 +54,7 @@
                             </div>
                         </div>
 
-                        <div *ngIf="complaintReportingFormGroup.controls?.['returnOption']?.value === 'Yes'">
+                        <div *ngIf="complaintReportingFormValues?.returnOption === 'Yes'">
                             <div class="mb-2">
                                 <div>
                                     <label>Is the product available at this address?</label>
@@ -54,37 +70,69 @@
                             </div>
                         </div>
 
-                        <div *ngIf="form.get('patientInformation.patient.isProductAvailable')?.value === false">
-                            <h3 class="fw-semibold">Please provide the below address details for pickup</h3>
+                        <div *ngIf="formGroup.get('patientInformation.patient.isProductAvailable')?.value === false">
+                            <h2 class="primary-text-color font-medium mb-0">Please provide the below address details for pickup</h2>
 
                             <app-contact-information controlName="patientInformation.patient.additionalContactInformation"></app-contact-information>
                         </div>
                     </div>
                     <div
                         *ngIf="
-                    complaintReportingFormGroup.controls?.['userType']?.value === UserTypes.Patient ||
-                    complaintReportingFormGroup.controls?.['userType']?.value === UserTypes.HealthcareProfessional
-                "
+                            complaintReportingFormValues?.userType === UserTypes.Patient ||
+                            complaintReportingFormValues?.userType === UserTypes.HealthcareProfessional
+                        "
                     >
-                        <mat-form-field class="default-control-width mb-2" appearance="outline">
+                        <!-- <mat-form-field class="default-control-width mb-2" appearance="outline">
                             <mat-label>Is the physician or treating HCP aware of the complaint?</mat-label>
                             <mat-select formControlName="awareOfComplaint">
                                 <mat-option *ngFor="let option of physicianAwarenessValues" [value]="option">{{ option }}</mat-option>
                             </mat-select>
-                        </mat-form-field>
+                        </mat-form-field> -->
+                        <div class="form-group">
+                            <label for="awareOfComplaint" class="mb-2 fs-6">Is the physician or treating HCP aware of the complaint?</label>
+                            <ng-select
+                                [selectOnTab]="true"
+                                labelForId="awareOfComplaint"
+                                formControlName="awareOfComplaint"
+                                placeholder="Select an option"
+                                aria-label="Aware of Complaint"
+                                class="form-floating"
+                                appearance="outline"
+                                appendTo="body"
+                            >
+                                <ng-option *ngFor="let option of physicianAwarenessValues" [value]="option">{{ option }}</ng-option>
+                            </ng-select>
+                        </div>
                     </div>
 
                     <div>
-                        <mat-form-field class="default-control-width mb-2" appearance="outline">
+                        <!-- <mat-form-field class="default-control-width mb-2" appearance="outline">
                             <mat-label>Does J & J have permission to contact your healthcare provider about this report?</mat-label>
                             <mat-select formControlName="permissionToContactHCP">
                                 <mat-option *ngFor="let option of permissionToContactHCPValues" [value]="option">{{ option }}</mat-option>
                             </mat-select>
-                        </mat-form-field>
+                        </mat-form-field> -->
+                        <div class="form-group">
+                            <label for="permissionToContactHCP" class="mb-2 fs-6"
+                                >Does J & J have permission to contact your healthcare provider about this report?</label
+                            >
+                            <ng-select
+                                [selectOnTab]="true"
+                                labelForId="permissionToContactHCP"
+                                formControlName="permissionToContactHCP"
+                                placeholder="Select an option"
+                                aria-label="Permission to Contact HCP"
+                                class="form-floating"
+                                appearance="outline"
+                                appendTo="body"
+                            >
+                                <ng-option *ngFor="let option of permissionToContactHCPValues" [value]="option">{{ option }}</ng-option>
+                            </ng-select>
+                        </div>
                     </div>
 
-                    <div formGroupName="hcp" *ngIf="form.get('patientInformation.permissionToContactHCP')?.value === 'Yes'">
-                        <p class="fw-semibold">Healthcare provider Details</p>
+                    <div formGroupName="hcp" *ngIf="formGroup.get('patientInformation.permissionToContactHCP')?.value === 'Yes'">
+                        <p class="secondary-text-color font-medium fs-6 mb-3">Healthcare provider Details</p>
                         <app-person-name controlName="patientInformation.hcp.name"></app-person-name>
 
                         <app-contact-information controlName="patientInformation.hcp.contactInformation"></app-contact-information>
@@ -93,31 +141,40 @@
             </ng-container>
         </div>
 
-        <div
-            *ngIf="
-            complaintReportingFormGroup.controls?.['userType']?.value !== UserTypes.Patient &&
-            complaintReportingFormGroup.controls?.['userType']?.value !== null
-        "
-            class="mt-2"
-        >
-            <ng-container *ngIf="form.get('nonPatientInformation')">
-                <h2>PATIENT AND REPORTER INFORMATION</h2>
+        <div *ngIf="complaintReportingFormValues?.userType !== UserTypes.Patient && complaintReportingFormValues?.userType !== null" class="mt-2">
+            <ng-container *ngIf="formGroup.get('nonPatientInformation')">
+                <h2 class="primary-text-color font-medium mb-0">PATIENT AND REPORTER INFORMATION</h2>
                 <div formGroupName="nonPatientInformation">
-                    <div>
+                    <!-- <div>
                         <mat-form-field class="default-control-width mb-2" appearance="outline">
                             <mat-label>Does J&J have permission to contact the reporter?</mat-label>
                             <mat-select formControlName="permissionToContactReporter">
                                 <mat-option *ngFor="let option of permissionToContactReporterValues" [value]="option">{{ option }}</mat-option>
                             </mat-select>
                         </mat-form-field>
+                    </div> -->
+                    <div class="form-group">
+                        <label for="permissionToContactReporter" class="mb-2 fs-6">Does J&J have permission to contact the reporter?</label>
+                        <ng-select
+                            [selectOnTab]="true"
+                            labelForId="permissionToContactReporter"
+                            formControlName="permissionToContactReporter"
+                            placeholder="Select an option"
+                            aria-label="Permission to Contact Reporter"
+                            class="form-floating"
+                            appearance="outline"
+                            appendTo="body"
+                        >
+                            <ng-option *ngFor="let option of permissionToContactReporterValues" [value]="option">{{ option }}</ng-option>
+                        </ng-select>
                     </div>
                     <div formGroupName="patient">
-                        <p class="fw-semibold">Patient Details</p>
+                        <p class="secondary-text-color font-medium fs-6">Patient Details</p>
                         <app-person-name controlName="nonPatientInformation.patient.name"></app-person-name>
 
                         <app-contact-information controlName="nonPatientInformation.patient.contactInformation"></app-contact-information>
 
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-sm-12 col-lg-6">
                                 <mat-form-field class="default-control-width mb-2" appearance="outline">
                                     <mat-label>Date of Birth</mat-label>
@@ -135,7 +192,7 @@
                             </div>
                         </div>
 
-                        <div *ngIf="complaintReportingFormGroup.controls?.['returnOption']?.value === 'Yes'">
+                        <div *ngIf="complaintReportingFormValues?.returnOption === 'Yes'">
                             <div class="mb-2">
                                 <div>
                                     <label>Is the product available at this address?</label>
@@ -153,15 +210,15 @@
                             </div>
                         </div>
 
-                        <div *ngIf="form.get('nonPatientInformation.patient.isProductAvailable')?.value === false">
-                            <h3 class="fw-semibold">Please provide the below address details for pickup</h3>
+                        <div *ngIf="formGroup.get('nonPatientInformation.patient.isProductAvailable')?.value === false">
+                            <h2 class="primary-text-color font-medium mb-0">Please provide the below address details for pickup</h2>
                             <app-contact-information
                                 controlName="nonPatientInformation.patient.additionalContactInformation"
                             ></app-contact-information>
                         </div>
                     </div>
                     <div formGroupName="reporter">
-                        <p class="fw-semibold">Reporter Details</p>
+                        <p class="secondary-text-color font-medium fs-6">Reporter Details</p>
                         <app-person-name controlName="nonPatientInformation.reporter.name"></app-person-name>
 
                         <app-contact-information controlName="nonPatientInformation.reporter.contactInformation"></app-contact-information>
@@ -169,24 +226,40 @@
                     <div>
                         <mat-form-field class="default-control-width mb-2" appearance="outline">
                             <mat-label>Facility Name</mat-label>
-                            <input matInput placeholder="Permission to Contact" formControlName="facilityName" />
+                            <input matInput placeholder="Facility Name" formControlName="facilityName" />
                         </mat-form-field>
                     </div>
-                    <div>
+                    <!-- <div>
                         <mat-form-field class="default-control-width mb-2" appearance="outline">
                             <mat-label>Did the reporter administer the product?</mat-label>
                             <mat-select formControlName="reporterAdministeredProduct">
                                 <mat-option *ngFor="let option of reporterAdministrationValues" [value]="option">{{ option }}</mat-option>
                             </mat-select>
                         </mat-form-field>
+                    </div> -->
+                    <div class="form-group">
+                        <label for="reporterAdministeredProduct" class="mb-2 fs-6">Did the reporter administer the product?</label>
+                        <ng-select
+                            [selectOnTab]="true"
+                            labelForId="reporterAdministeredProduct"
+                            formControlName="reporterAdministeredProduct"
+                            placeholder="Select an option"
+                            aria-label="Did the reporter administer the product?"
+                            class="form-floating"
+                            appearance="outline"
+                            appendTo="body"
+                        >
+                            <ng-option *ngFor="let option of reporterAdministrationValues" [value]="option">{{ option }}</ng-option>
+                        </ng-select>
                     </div>
                 </div>
             </ng-container>
         </div>
     </div>
+
     <div class="mt-4 d-flex justify-content-between w-100">
         <button mat-stroked-button color="secondary" matStepperPrevious><mat-icon>arrow_back</mat-icon> Back</button>
-        <button mat-raised-button color="primary" class="primary-btn" matStepperNext [disabled]="!form.valid">
+        <button mat-raised-button color="primary" class="primary-btn" matStepperNext [disabled]="!formGroup.valid">
             Continue <mat-icon iconPositionEnd>arrow_forward</mat-icon>
         </button>
     </div>

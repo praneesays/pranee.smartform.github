@@ -1,9 +1,9 @@
 <ng-container [formGroup]="form">
-    <div class="row">
+    <div class="row mb-2">
         <div class="col-sm-12 col-lg-2">
             <mat-form-field class="default-control-width mb-2" appearance="outline">
                 <mat-label>Title</mat-label>
-                <mat-select formControlName="title" (blur)="onTouched()">
+                <mat-select formControlName="title">
                     <mat-option *ngFor="let option of titleOptions" [value]="option">{{ option }}</mat-option>
                 </mat-select>
             </mat-form-field>
@@ -11,22 +11,22 @@
         <div class="col-sm-12 col-lg-5">
             <mat-form-field class="default-control-width mb-2" appearance="outline">
                 <mat-label>First Name</mat-label>
-                <input matInput placeholder="First Name" formControlName="firstName" (blur)="onTouched()" />
+                <input matInput placeholder="First Name" formControlName="firstName" />
             </mat-form-field>
         </div>
 
         <div class="col-sm-12 col-lg-5">
-            <mat-form-field class="default-control-width mb-2" appearance="outline" class="d-none d-sm-block">
+            <mat-form-field class="default-control-width mb-2" appearance="outline">
                 <mat-label>Last Name</mat-label>
-                <input matInput placeholder="Last Name" formControlName="lastName" (blur)="onTouched()" />
+                <input matInput placeholder="Last Name" formControlName="lastName" />
             </mat-form-field>
 
-            <div class="d-block d-sm-none mb-2">
+            <!-- <div class="d-block d-sm-none mb-2">
                 <mat-label class="fw-normal text-secondary fs-6">Last Name</mat-label>
                 <mat-form-field class="default-control-width mt-1" appearance="outline" [floatLabel]="'auto'">
-                    <input matInput placeholder="Enter Last Name" formControlName="lastName" (blur)="onTouched()" />
+                    <input matInput placeholder="Enter Last Name" formControlName="lastName" />
                 </mat-form-field>
-            </div>
+            </div> -->
         </div>
     </div>
 </ng-container>

@@ -5,19 +5,27 @@
                 <h2 class="text-center">REVIEW</h2>
                 <div class="w-75 border rounded-3 px-5 py-3 me-auto ms-auto">
                     <h3 class="fw-semibold">Preliminary Information</h3>
-                    <div class="row" *ngFor="let control of formControls">
+                    <div class="row" *ngFor="let control of step1FormControls">
+                        <div class="col-sm-12 col-lg-6">{{ control.label }}</div>
+                        <div class="col-sm-12 col-lg-6">{{ control.value }}</div>
+                    </div>
+                </div>
+
+                <div class="w-75 border rounded-3 px-5 py-3 me-auto ms-auto">
+                    <h3 class="fw-semibold">Contact Information</h3>
+                    <div class="row" *ngFor="let control of step2FormControls">
                         <div class="col-sm-12 col-lg-6">{{ control.label }}</div>
                         <div class="col-sm-12 col-lg-6">{{ control.value }}</div>
                     </div>
                 </div>
             </div>
-            <div class="text-center privacy-text mt-3">
+            <!-- <div class="text-center privacy-text mt-3">
                 JnJ will handle this adverse event, contact information, and personal information provided in accordance with its Privacy Policy. You
                 can view Janssen's Privacy Policy by clicking on the link <a href="#"> Janssen's Privacy Policy</a>
             </div>
             <mat-checkbox class="example-margin mt-3" color="primary" [(ngModel)]="privacyPolicyChecked"
                 >I acknowledge Janssen's Privacy Policy</mat-checkbox
-            >
+            > -->
         </div>
 
         <div class="mt-4 d-flex justify-content-center w-100 gap-5">

@@ -1,0 +1,65 @@
+<div *ngIf="imageWithDimensions$ | async as imageWithDimensions" class="w-100 h-100">
+    <div class="d-flex gap-2 flex-column my-2">
+        <div class="w-100 w-md-50 p-2 border rounded-3 shadow-sm">
+            <mat-selection-list #labels [multiple]="false" color="primary" class="selection-list">
+                <mat-list-option
+                    *ngFor="let area of areas; let i = index"
+                    [value]="area.value"
+                    [selected]="area.selected"
+                    (click)="selectHotspot(area)"
+                >
+                    <span class="me-2">{{ i + 1 }}</span> <span>{{ area.value }}</span>
+                </mat-list-option>
+            </mat-selection-list>
+        </div>
+
+        <div class="me-2 pb-2 pb-md-1 w-100 h-100 d-flex">
+            <div class="svg-container flex-grow-1">
+                <figure [style.height.px]="imageWithDimensions.height" class="w-100">
+                    <svg
+                        [attr.viewBox]="dynamicViewBox"
+                        [attr.width]="imageWithDimensions.width"
+                        [attr.height]="imageWithDimensions.height"
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="img-fluid"
+                    >
+                        <image
+                            [attr.href]="imageWithDimensions.dataUrl"
+                            [attr.width]="imageWithDimensions.width"
+                            [attr.height]="imageWithDimensions.height"
+                        />
+                        <ng-container *ngFor="let area of areas; let i = index">
+                            <a class="text-decoration-none cursor-pointer" (click)="selectHotspot(area)" [matTooltip]="area.value">
+                                <circle
+                                    [attr.cx]="area.x"
+                                    [attr.cy]="area.y"
+                                    [attr.r]="10"
+                                    [attr.fill]="area.selected ? '#0a58ca' : '#fff'"
+                                    [ngClass]="{ active: area.selected }"
+                                    stroke="gray"
+                                    stroke-width="1"
+                                    class="circle"
+                                ></circle>
+                                <text
+                                    [attr.x]="area.x"
+                                    [attr.y]="area.y"
+                                    text-anchor="middle"
+                                    alignment-baseline="middle"
+                                    stroke="gray"
+                                    [ngClass]="{ active: area.selected }"
+                                    class="text"
+                                >
+                                    {{ i + 1 }}
+                                </text>
+                            </a>
+                        </ng-container>
+                    </svg>
+                </figure>
+            </div>
+            <div class="d-flex flex-column gap-2">
+                <button mat-stroked-button color="secondary" (click)="clearAllSelections()">I don't know about the part</button>
+                <button mat-stroked-button color="secondary" (click)="clearAllSelections()">Medicine</button>
+            </div>
+        </div>
+    </div>
+</div>

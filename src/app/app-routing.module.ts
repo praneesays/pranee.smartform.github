@@ -1,46 +1,83 @@
+import { Location } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { ComplaintFormComponent } from "./components/complaint-form/complaint-form.component";
-import { StepperComponent } from "./components/stepper/stepper.component";
-import { ProblemDescriptionFormComponent } from "./components/problem-description-form/problem-description-form.component";
+import {
+    LocalizeParser,
+    LocalizeRouterModule,
+    LocalizeRouterSettings
+} from "@gilsdav/ngx-translate-router";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
+import { UiLocalizationApiService } from "./api/ui-localization-api.service";
 import { LocaleSelectorComponent } from "./components/locale-selector/locale-selector.component";
-import { CountryGuard } from "./shared/country.guard";
+import { StepperComponent } from "./components/stepper/stepper.component";
+import { ContactUsComponent } from "./components/contact-us/contact-us.component";
+import { ApiLocalizeParser } from "./shared/localization/api-translation-loader";
 
-const routes: Routes = [
-    { path: "", component: LocaleSelectorComponent },
-    // { path: ":lang", component: LocaleSelectorComponent },
-    {
-        path: ":countryCode/home",
-        component: StepperComponent,
-        canActivate: [CountryGuard]
-    },
-    {
-        path: ":countryCode/:languageCode/home",
-        component: StepperComponent,
-        canActivate: [CountryGuard]
-    },
-    {
-        path: "**",
-        redirectTo: "",
-        canActivate: [CountryGuard]
-    }
-];
+export function createApiLocalizeParser(
+    translate: TranslateService,
+    location: Location,
+    settings: LocalizeRouterSettings,
+    uiLocalizationApi: UiLocalizationApiService
+) {
+    return new ApiLocalizeParser(
+        translate,
+        location,
+        settings,
+        uiLocalizationApi
+    );
+}
 
-// const routes: Routes = [
-//     // { path: '', component: ProblemDescriptionFormComponent },
-//     // { path: "", component: ComplaintFormComponent },
-//     { path: "", component: StepperComponent },
-//     // { path: '', component: LocaleSelectorComponent },
-//     // { path: ':countryCode/home', component: ComplaintFormComponent },
-//     // { path: ':countryCode/:languageCode/home', component: ComplaintFormComponent },
-//     {
-//         path: "**",
-//         redirectTo: ""
-//     }
-// ];
+let routes: Routes;
+const additionalImports: any[] = [];
+if (window.location.pathname !== "/") {
+    routes = [
+        {
+            path: "",
+            pathMatch: "full",
+            redirectTo: "select-locale",
+            data: { skipRouteLocalization: true }
+        },
+        {
+            path: "home",
+            component: StepperComponent
+        }
+        // {
+        //     path: "**",
+        //     redirectTo: "select-locale"
+        // }
+    ];
+
+    additionalImports.push(
+        TranslateModule.forChild(),
+        LocalizeRouterModule.forRoot(routes, {
+            parser: {
+                provide: LocalizeParser,
+                useFactory: createApiLocalizeParser,
+                deps: [
+                    TranslateService,
+                    Location,
+                    LocalizeRouterSettings,
+                    UiLocalizationApiService
+                ]
+            },
+            alwaysSetPrefix: true
+        })
+    );
+} else {
+    routes = [
+        {
+            path: "",
+            component: LocaleSelectorComponent
+        },
+        {
+            path: "contact-us",
+            component: ContactUsComponent
+        }
+    ];
+}
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes)],
+    imports: [RouterModule.forRoot(routes), ...additionalImports],
     exports: [RouterModule]
 })
 export class AppRoutingModule {}

@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import { Observable } from "rxjs";
 
 export interface IProductInformation {
     productQualityComplaint: boolean | null;
@@ -17,32 +18,48 @@ export interface IInitialReporting {
     product: string;
 }
 
+export interface ILetterRange {
+    readonly name: string;
+    readonly from: string;
+    readonly to: string;
+    readonly hasAny$: Observable<boolean>;
+    readonly hasNone$: Observable<boolean>;
+
+    matches(value: string): boolean;
+}
+
+export const UNKNOWN = Symbol();
+
+export interface IBrandFormSelection {
+    formId: string;
+    brandId: string;
+}
+
 export interface IComplaintReporting {
     userType: UserTypes | null;
     purchasedCountry: Country | null;
-    product: string;
-    brand: string;
-    strength: string;
+    brandAndForm: IBrandFormSelection | null;
+    strengthId: string | null;
 
     returnOption: ReturnOption | null;
 
-    hasBatchLotNumber: boolean | null;
-    batchLotNumber?: string;
-    noReason?: string;
+    hasBatchOrLotNumber: boolean | null;
+    batchOrLotNumber: string | null;
+    batchOrLotNumberUnavailableReason: BatchOrLotNumberUnavailableReason | null;
 
-    gtin?: string;
-    serial?: string;
+    gtin: string | null;
+    serial: string | null;
 
     hcp: IHcpData;
 
-    issueDescription: string;
-    uploadImage?: File[];
+    // issueDescription: string;
+    // uploadImage?: File[];
 }
 
 export interface IHcpData {
     reportedFromJNJProgram: boolean | null;
 
-    studyProgram?: string;
+    studyProgram: string | null;
     siteNumber: number | null;
     subjectNumber: number | null;
 }
@@ -76,8 +93,8 @@ export interface Brand {
 }
 
 export interface IUserDetails {
-    patientInformation: IPatientInformation;
-    nonPatientInformation: INonPatientInformation;
+    patientInformation?: IPatientInformation;
+    nonPatientInformation?: INonPatientInformation;
 }
 
 export interface IPatientInformation {
@@ -85,7 +102,7 @@ export interface IPatientInformation {
     awareOfComplaint: PhysicianAwareness | null;
     permissionToContact: ContactPermission | null;
     permissionToContactHCP: ContactPermissionHCP | null;
-    hcp: IHCPDetails;
+    hcp?: IHCPDetails;
 }
 
 export interface INonPatientInformation {
@@ -97,8 +114,8 @@ export interface INonPatientInformation {
 }
 
 export interface IPatientDetails extends IPersonDetails {
-    isProductAvailable: boolean | null;
-    additionalContactInformation: IContactInformation;
+    isProductAvailable?: boolean | null;
+    additionalContactInformation?: IContactInformation;
     dateOfBirth: DateTime;
     ageAtComplaint?: string | null;
 }
@@ -106,6 +123,11 @@ export interface IPatientDetails extends IPersonDetails {
 export interface IReporterDetails extends IPersonDetails {}
 
 export interface IHCPDetails extends IPersonDetails {}
+
+export interface IPersonDetails {
+    name: IPersonName;
+    contactInformation: IContactInformation;
+}
 
 export interface IPersonName {
     title?: Title | null;
@@ -122,11 +144,6 @@ export interface IContactInformation {
     state?: string;
     telephone?: string;
     emailAddress?: string;
-}
-
-export interface IPersonDetails {
-    name: IPersonName;
-    contactInformation: IContactInformation;
 }
 
 export interface IPatientMedicalHistory {
@@ -149,14 +166,18 @@ export interface IProductDetails {
 }
 
 export interface IComplaintDetails {
-    product: IProductDetails;
-    reportedFromJNJProgram: string;
+    selectedComplaint?: string;
+    issueDescription: string;
+    uploadImage?: File[];
 
-    studyProgram: string;
-    siteNumber: number | null;
-    subjectNumber: number | null;
+    question: IProblemDetailsWithDone;
+}
 
-    complaintDescription: string;
+export interface IProblemDetailsWithDone {
+    done: boolean;
+    questions: Record<string, any>;
+
+    followUpOkay: boolean;
 }
 
 export interface ConcomitantMedication {
@@ -609,6 +630,19 @@ export enum ReturnOption {
     NoProductDiscarded = "No - Product was discarded",
     NoSampleWithAnotherParty = "No - Sample is with another party",
     NoProductAdministeredAtHCPFacility = "No - Product administered at HCP facility"
+}
+
+export enum BatchOrLotNumberUnavailableReason {
+    CoveredByPharmacyLabel = "Covered by Pharmacy Label",
+    Discarded = "Discarded",
+    DisconnectedPriorToRequestingInfo = "Disconnected prior to Requesting Info",
+    InPharmacyContainer = "In a Pharmacy Container",
+    InformationNotRequestedByESP = "Information not requested by ESP/Employee",
+    NotProvidedInSourceMaterial = "Not Provided in Source Material",
+    Other = "Other",
+    ProductWithAnotherParty = "Product with another party",
+    Refused = "Refused",
+    UnknownPotentialFollowUp = "Unknown- Potential follow-up"
 }
 
 export interface IProblemSummary {

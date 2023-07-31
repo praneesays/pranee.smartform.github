@@ -14,7 +14,23 @@
             label="Preliminary Information"
         >
             <ng-template matStepContent>
-                <app-complaint-reporting [form]="complaintReportingFormGroup" [products]="products"></app-complaint-reporting>
+                <app-complaint-reporting [formControl]="complaintReportingFormGroup"></app-complaint-reporting>
+            </ng-template>
+        </mat-step>
+        <mat-step
+            [stepControl]="problemDetailsQuestionsFormGroup"
+            [editable]="!complaintSubmitted"
+            [completed]="complaintSubmitted"
+            class="w-75 h-100"
+            label="Details"
+        >
+            <ng-template matStepContent>
+                <app-complaint-details
+                    [form]="complaintDetailsFormGroup"
+                    [products]="products"
+                    [problemDetailsQuestions]="problemDetailsQuestions"
+                    (nextClicked)="loadQuestions()"
+                ></app-complaint-details>
             </ng-template>
         </mat-step>
         <mat-step
@@ -22,20 +38,20 @@
             [editable]="!complaintSubmitted"
             [completed]="complaintSubmitted"
             class="w-75 h-100"
-            label="User Details"
+            label="Contact Information"
         >
             <ng-template matStepContent>
                 <app-user-details
-                    [form]="userDetailsFormGroup"
-                    [complaintReportingFormGroup]="complaintReportingFormGroup"
+                    [formControl]="userDetailsFormGroup"
                     [products]="products"
+                    [complaintReportingFormValues]="complaintReportingFormGroup.value!"
                 ></app-user-details>
             </ng-template>
         </mat-step>
         <mat-step [editable]="!complaintSubmitted" [completed]="complaintSubmitted" class="w-75 h-100">
             <ng-template matStepLabel>Review</ng-template>
             <ng-template matStepContent>
-                <app-review [complaintSubmitted]="complaintSubmitted" [formControls]="formControls"></app-review>
+                <app-review [complaintSubmitted]="complaintSubmitted" [step1FormControls]="step1FormControls"></app-review>
             </ng-template>
         </mat-step>
     </mat-stepper>

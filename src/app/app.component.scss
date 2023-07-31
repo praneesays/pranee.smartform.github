@@ -1,10 +1,10 @@
 .wizard-container {
     .main-container {
-        // width: calc(100% - 266px);
+        /* width: calc(100% - 266px); */
         width: 100%;
     }
     @media screen and (min-width: 800px) {
-        // width: calc(100% - 325px);
+        /* width: calc(100% - 325px); */
     }
 
     .wizard-label {
@@ -26,10 +26,10 @@
 
 main {
     flex: 1;
-    // background-color: #ffffff;
+    /* background-color: #ffffff; */
     border-radius: 1rem;
     margin: 2rem auto;
-    margin-top: 65px;
+    margin-top: 95px;
 
     .wrapper {
         flex: 1;
@@ -52,5 +52,9 @@ app-footer {
         .side-container {
             display: none;
         }
+    }
+
+    main {
+        margin-top: 120px;
     }
 }

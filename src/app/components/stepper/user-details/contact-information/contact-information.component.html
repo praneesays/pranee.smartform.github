@@ -1,8 +1,12 @@
-<ng-container [formGroup]="form">
-    <div class="row">
+<ng-container [formGroup]="form" *ngIf="form">
+    <div class="row mb-2">
         <div class="col-sm-12 col-lg-6">
             <mat-form-field class="default-control-width mb-2" appearance="outline">
                 <mat-label>Address Line 1</mat-label>
+                <mat-hint
+                    >Please Note: Product cannot be retrieved from a P.O. Box. Please provide a valid street mailing address where product is
+                    located.</mat-hint
+                >
                 <input matInput placeholder="Address Line 1" formControlName="addressLine1" />
             </mat-form-field>
         </div>
@@ -13,7 +17,7 @@
             </mat-form-field>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-2">
         <div class="col-sm-12 col-lg-6">
             <mat-form-field class="default-control-width mb-2" appearance="outline">
                 <mat-label>City</mat-label>
@@ -33,7 +37,7 @@
             </mat-form-field>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-2">
         <div class="col-sm-12 col-lg-6">
             <mat-form-field class="default-control-width mb-2" appearance="outline">
                 <mat-label>Postal Code</mat-label>
@@ -47,7 +51,7 @@
             </mat-form-field>
         </div>
     </div>
-    <div class="row">
+    <div class="row mb-2">
         <div class="col-sm-12 col-lg-6">
             <mat-form-field class="default-control-width mb-2" appearance="outline">
                 <mat-label>Telephone</mat-label>

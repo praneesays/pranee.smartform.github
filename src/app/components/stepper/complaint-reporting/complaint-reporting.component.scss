@@ -20,103 +20,6 @@
     min-height: 300px;
 }
 
-.vertical-tabs-section {
-    .vertical-tabs {
-        ::ng-deep {
-            button {
-                color: gray;
-                font-weight: 500;
-                // width: 95%;
-                text-align: left;
-                font-size: 16px;
-            }
-        }
-        &.nav-pills .nav-link {
-            &.active {
-                border: 3px solid $primary-color;
-                color: $primary-color;
-                background-color: #fff;
-            }
-        }
-    }
-
-    .tab-content {
-        padding: 0.5rem 1rem;
-    }
-
-    [type="radio"] {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    [type="radio"] + img {
-        width: 200px;
-        height: 150px;
-        border-radius: 0.5rem;
-        cursor: pointer;
-    }
-
-    [type="radio"] + .product-section {
-        box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px,
-            rgba(17, 17, 26, 0.1) 0px 0px 8px;
-        cursor: pointer;
-        transition: transform 0.5s;
-        &:hover {
-            transform: scale(1.1);
-        }
-
-        .image-section {
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            width: 150px;
-            height: 150px;
-            margin: 2px;
-        }
-
-        .image-caption {
-            background: #cccccc8c;
-            border-bottom-left-radius: 0.5rem;
-            border-bottom-right-radius: 0.5rem;
-        }
-    }
-
-    [type="radio"]:checked + .product-section {
-        outline: 3px solid $primary-color;
-        box-shadow: $primary-color 0px 3px 8px;
-        &:hover {
-            transform: scale(1);
-        }
-
-        .image-caption {
-            background: #0a58ca;
-            color: #fff;
-            border-bottom-left-radius: 0.5rem;
-            border-bottom-right-radius: 0.5rem;
-        }
-    }
-}
-
-.brands_section {
-    .filter-section {
-        button {
-            &.active {
-                background-color: $primary-color;
-                color: #fff;
-            }
-        }
-    }
-}
-
-.mat-step-header .mat-step-icon-selected {
-    background-color: $primary-color;
-}
-
-.mat-mdc-standard-chip.mat-primary.mat-mdc-chip-selected {
-    background-color: $primary-color;
-}
-
 .chip-options-sections {
     [type="radio"] {
         position: absolute;
@@ -151,20 +54,6 @@
         margin-top: 1rem;
         h2 {
             padding: 1rem;
-        }
-    }
-}
-
-@media (max-width: 576px) {
-    .vertical-tabs-section {
-        [type="radio"] + .product-section {
-            .image-section {
-                width: 120px;
-                height: 120px;
-            }
-
-            .image-caption {
-            }
         }
     }
 }

@@ -1,7 +1,7 @@
-::ng-deep {.blurred-backdrop {
-    backdrop-filter: blur(10px);
-}
-
+::ng-deep {
+    .blurred-backdrop {
+        backdrop-filter: blur(10px);
+    }
 }
 
 mat-divider {
@@ -13,8 +13,13 @@ mat-divider {
     justify-content: space-between;
     align-items: center;
     padding-bottom: 6px;
-    
-    >.header-title {
+
+    > .header-title {
         font-size: x-large;
+    }
+
+    .header-logo {
+        min-width: 205px;
+        max-width: 245px;
     }
 }

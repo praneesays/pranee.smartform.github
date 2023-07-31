@@ -1,0 +1,11 @@
+<div class="mb-1 mt-3">
+    <mat-form-field class="default-control-width mb-2" appearance="outline">
+        <mat-label>Describe your issue</mat-label>
+        <mat-hint>Please include any details that may be relevant and and sequence of events</mat-hint>
+        <textarea matInput placeholder="Describe your issue" formControlName="issueDescription"></textarea>
+    </mat-form-field>
+</div>
+
+<div class="mb-1">
+    <app-image-upload formControlName="uploadImage" text="Upload images (optional)"></app-image-upload>
+</div>

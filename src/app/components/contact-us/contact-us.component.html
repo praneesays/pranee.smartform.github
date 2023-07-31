@@ -1,0 +1,43 @@
+<div class="w-100 h-100 d-flex flex-column align-items-center bg-white rounded-3 shadow px-3 px-md-5 py-3">
+    <h2 class="primary-text-color">Feedback/Enquiry form</h2>
+    <div class="form-container mb-4 pb-4">
+        <form #myform="ngForm" [formGroup]="form" class="d-flex flex-column gap-4 w-100">
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>First Name</mat-label>
+                <input matInput formControlName="firstName" placeholder="First Name" aria-label="First Name" />
+                <mat-error *ngIf="form.get('firstName')?.invalid && form.get('firstName')?.touched"> This field is required. </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>Last Name</mat-label>
+                <input matInput formControlName="lastName" placeholder="Last Name" aria-label="Last Name" />
+                <mat-error *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched"> This field is required. </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>Email</mat-label>
+                <mat-hint
+                    >The information you provide will be processed for the purpose managing your complaint and to address our legal obligations to
+                    ensure the safety and quality of our products. Information you provide may be shared with other J&J affiliates, external service
+                    providers and health authorities, as necessary, to fulfill these obligations. It may also be shared with other companies where
+                    your information refers to a medicinal product, which is now owned by us. Such a company is required to process your information
+                    to the extent necessary to comply with its legal obligations related to quality and safety. If you provide personal information
+                    that concerns other individuals, you represent that you have the necessary permissions and consents to do so. Further, information
+                    about our practices processing personal information, can be found in our
+                    <a href="https://www.janssen.com/privacy-policy" target="_blank">Privacy Policy</a>
+                </mat-hint>
+                <input matInput formControlName="email" placeholder="Email" aria-label="Email" />
+                <mat-error *ngIf="form.get('email')?.hasError('required') && form.get('email')?.touched"> Email is required. </mat-error>
+                <mat-error *ngIf="form.get('email')?.hasError('email') && form.get('email')?.touched"> Invalid email format. </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field" appearance="outline">
+                <mat-label>Message</mat-label>
+                <textarea matInput formControlName="message" placeholder="Message" aria-label="Message"></textarea>
+                <mat-error *ngIf="form.get('message')?.invalid && form.get('message')?.touched"> This field is required. </mat-error>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" class="primary-btn" type="submit" (click)="onSubmit()">Submit</button>
+        </form>
+    </div>
+</div>

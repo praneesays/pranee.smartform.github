@@ -3,7 +3,7 @@
 :host {
     display: block;
     height: 100%;
-    // padding: 1rem 2rem;
+    /* padding: 1rem 2rem; */
 }
 
 .mat-stepper-horizontal {
@@ -50,7 +50,7 @@
 
 .default-control-width {
     width: 100%;
-    // max-width: 400px;
+    /* max-width: 400px; */
 }
 
 .empty-selection {
@@ -167,12 +167,11 @@ mat-expansion-panel-header.invalid {
 
 .vertical-tabs-section {
     .vertical-tabs {
-        // width: 20%;
+        /* width: 20%; */
         ::ng-deep {
             button {
                 color: gray;
                 font-weight: 500;
-                // width: 95%;
                 text-align: left;
                 font-size: 16px;
             }
@@ -193,7 +192,7 @@ mat-expansion-panel-header.invalid {
     }
 
     .tab-content {
-        // width: 80%;
+        /* width: 80%; */
         padding: 0.5rem 1rem;
     }
 
@@ -208,7 +207,7 @@ mat-expansion-panel-header.invalid {
         width: 200px;
         height: 150px;
         border-radius: 0.5rem;
-        // box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        /* box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; */
         cursor: pointer;
     }
 
@@ -227,7 +226,7 @@ mat-expansion-panel-header.invalid {
         }
 
         .image-section {
-            // background: #cccccc8c;
+            /* background: #cccccc8c; */
             /* border-radius: 0.5rem; */
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;

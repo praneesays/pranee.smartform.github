@@ -1,3 +1,4 @@
+import { StepperSelectionEvent } from "@angular/cdk/stepper";
 import {
     AfterViewInit,
     Component,
@@ -19,7 +20,7 @@ import { MatStepper } from "@angular/material/stepper";
 import { ActivatedRoute } from "@angular/router";
 import { DateTime } from "luxon";
 import {
-    filter,
+    distinctUntilChanged,
     map,
     Observable,
     of,
@@ -28,62 +29,50 @@ import {
     switchMap,
     takeUntil
 } from "rxjs";
+import { ProgressBarService } from "src/app/services/progress-bar.service";
+import {
+    filterTruthy,
+    observeFormControlValue
+} from "src/app/utilities/rxjs-utils";
 import { environment } from "src/environments/environment";
 import { Question } from "../../questions";
 import {
-    IQuestionsRequest,
+    IIQuestionsRequest,
     IQuestionsRequestAnswer,
     QuestionsService
 } from "../../services/questions.service";
 import {
+    Brand,
+    ComplaintReportTypes,
+    ContactPermission,
+    ContactPermissionHCP,
+    ContactPermissionReporter,
+    Country,
     IAddress,
+    IComplaintDetails,
+    IComplaintReporting,
     IContactData,
+    IContactInformation,
+    IHCPDetails,
     IInitialReporting,
+    INonPatientInformation,
+    IPatientDetails,
+    IPatientInformation,
     IPersonalData,
     IPersonalInformation,
+    IPersonName,
+    IProblemDetailsWithDone,
     IProblemSummary,
     IProductInformation,
-    UserTypes,
-    ProductTypes,
-    ComplaintReportTypes,
-    IComplaintReporting,
-    IPatientDetails,
     IReporterDetails,
-    IProductDetails,
-    IComplaintDetails,
-    Country,
     IUserDetails,
-    IPatientInformation,
-    INonPatientInformation,
-    AlcoholConsumptionStatus,
-    AllergyStatus,
-    ContactPermission,
-    ContactPermissionReporter,
-    DrugAbuseStatus,
-    Gender,
-    IContactInformation,
     PhysicianAwareness,
-    ReporterAdministration,
-    SmokingStatus,
-    Title,
-    AdministeredBy,
-    RouteOfAdministration,
-    ConcomitantMedicationStatus,
-    ConcomitantMedicationDetails,
-    ConcomitantMedication,
-    ContactPermissionHCP,
-    IHCPDetails,
     Product,
-    Brand,
-    HeightUnit,
-    WeightUnit,
-    ConsumptionUnit,
-    ReturnOption,
-    IHcpData,
-    IPersonName
+    ProductTypes,
+    ReporterAdministration,
+    Title,
+    UserTypes
 } from "../../types";
-import { ProgressBarService } from "src/app/services/progress-bar.service";
-import { StepperSelectionEvent } from "@angular/cdk/stepper";
 
 export type FormGroupType<T> = {
     [k in keyof T]: T[k] extends
@@ -95,6 +84,7 @@ export type FormGroupType<T> = {
         | File
         | null
         | undefined
+        | symbol
         ? FormControl<T[k]>
         : FormGroup<FormGroupType<T[k]>>;
 };
@@ -110,12 +100,12 @@ export const _filter = (opt: string[], value: string): string[] => {
     return opt.filter((item) => item.toLowerCase().includes(filterValue));
 };
 
-interface IProblemDetailsWithDone {
-    done: boolean;
-    questions: Record<string, any>;
+// interface IProblemDetailsWithDone {
+//     done: boolean;
+//     questions: Record<string, any>;
 
-    followUpOkay: boolean;
-}
+//     followUpOkay: boolean;
+// }
 
 const products: Product[] = [
     {
@@ -131,7 +121,8 @@ const products: Product[] = [
         brands: [
             { name: "Stelara", imagePath: "./assets/brands/Stelara.png" },
             { name: "Tremfya", imagePath: "./assets/brands/Tremfya.png" },
-            { name: "Invega", imagePath: "./assets/brands/Invega.png" }
+            { name: "Invega", imagePath: "./assets/brands/Invega.png" },
+            { name: "Simponi", imagePath: "./assets/brands/Simponi.png" }
         ]
     },
     {
@@ -218,16 +209,6 @@ const products: Product[] = [
         ]
     },
     {
-        name: "Other",
-        type: ProductTypes.Other,
-        imagePath: "./assets/products/other.png",
-        brands: [
-            { name: "Carvykti", imagePath: "./assets/brands/Carvykti.png" },
-            { name: "Cabenuva", imagePath: "./assets/brands/Cabenuva.png" },
-            { name: "Akeega", imagePath: "./assets/brands/Akeega.png" }
-        ]
-    },
-    {
         name: "Unknown",
         type: ProductTypes.Unknown,
         imagePath: "./assets/products/unknown.png",
@@ -276,6 +257,8 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
     readonly ProductTypes = ProductTypes;
 
     complaintSubmitted: boolean = false;
+    problemDetailsQuestions: Question[] = [];
+
     readonly authorized$: Observable<boolean>;
 
     readonly productFormGroup: FormGroup<FormGroupType<IProductInformation>>;
@@ -292,15 +275,9 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
     >;
 
     readonly problemDetailsQuestionsFormGroup: FormRecord;
-    problemDetailsQuestions: Question[] = [];
 
-    imageHotspotValues: Question[] = [];
-
-    readonly complaintReportingFormGroup: FormGroup<
-        FormGroupType<IComplaintReporting>
-    >;
-    readonly userDetailsFormGroup: FormGroup<FormGroupType<IUserDetails>>;
-    readonly userDetailsFormGroupBackup: IUserDetails;
+    readonly complaintReportingFormGroup: FormControl<IComplaintReporting | null>;
+    readonly userDetailsFormGroup: FormControl<IUserDetails | null>;
 
     readonly patientInformationFormGroup: FormGroup<
         FormGroupType<IPatientInformation>
@@ -309,6 +286,8 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
     readonly nonPatientInformationFormGroup: FormGroup<
         FormGroupType<INonPatientInformation>
     >;
+
+    readonly hcpFormGroup: FormGroup<FormGroupType<IHCPDetails>>;
 
     readonly nameInformationFormGroup: FormGroup<FormGroupType<IPersonName>>;
     readonly contactInformationFormGroup: FormGroup<
@@ -453,7 +432,6 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
 
     activeStepIndex: number = 0;
 
-    @ViewChild("brandsSection") brandsSection!: ElementRef;
     @ViewChild("strengthSection") strengthSection?: ElementRef;
     @ViewChild(MatStepper) stepper!: MatStepper;
 
@@ -592,80 +570,13 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
             })
         });
 
-        this.complaintReportingFormGroup = fb.group<
-            FormGroupType<IComplaintReporting>
-        >({
-            userType: fb.control<UserTypes | null>(null, {
-                nonNullable: true,
+        this.complaintReportingFormGroup =
+            fb.control<IComplaintReporting | null>(null, {
                 validators: [Validators.required]
-            }),
-            purchasedCountry: fb.control<Country | null>(null, {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            product: fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            brand: fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            strength: fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            returnOption: fb.control<ReturnOption | null>(null, {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            hasBatchLotNumber: fb.control<boolean | null>(null, {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            batchLotNumber: fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            noReason: fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            gtin: fb.control<string>("", {
-                nonNullable: true,
-                validators: []
-            }),
-            serial: fb.control<string>("", {
-                nonNullable: true,
-                validators: []
-            }),
-            hcp: fb.group<FormGroupType<IHcpData>>({
-                reportedFromJNJProgram: fb.control<boolean | null>(null, {
-                    nonNullable: true,
-                    validators: []
-                }),
-                studyProgram: fb.control<string>("", {
-                    nonNullable: true,
-                    validators: []
-                }),
-                siteNumber: fb.control<number | null>(null, {
-                    nonNullable: true,
-                    validators: []
-                }),
-                subjectNumber: fb.control<number | null>(null, {
-                    nonNullable: true,
-                    validators: []
-                })
-            }),
-            issueDescription: fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            uploadImage: fb.control<File[]>([], {
-                nonNullable: true,
-                validators: []
-            })
-            // productImage: fb.control<string>("", { nonNullable: true, validators: [] }),
+            });
+
+        this.userDetailsFormGroup = fb.control<IUserDetails | null>(null, {
+            validators: [Validators.required]
         });
 
         this.patientInformationFormGroup = fb.group<
@@ -678,11 +589,7 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
             patient: fb.group<FormGroupType<IPatientDetails>>({
                 name: this.nameInformationFormGroup,
                 contactInformation: this.contactInformationFormGroup,
-                isProductAvailable: fb.control<boolean | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-                additionalContactInformation: this.contactInformationFormGroup,
+                // additionalContactInformation: this.contactInformationFormGroup,
                 dateOfBirth: fb.control<DateTime>(
                     DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
                     { nonNullable: true, validators: [] }
@@ -702,11 +609,7 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
                     nonNullable: true,
                     validators: [Validators.required]
                 }
-            ),
-            hcp: fb.group<FormGroupType<IHCPDetails>>({
-                name: this.nameInformationFormGroup,
-                contactInformation: this.contactInformationFormGroup
-            })
+            )
         });
 
         this.nonPatientInformationFormGroup = fb.group<
@@ -724,48 +627,7 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
                     nonNullable: true,
                     validators: [Validators.required]
                 }),
-                additionalContactInformation: this.contactInformationFormGroup,
-                // additionalContactInformation: fb.group<
-                //     FormGroupType<IContactInformation>
-                // >({
-                //     addressLine1: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     addressLine2: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: []
-                //     }),
-                //     city: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     country: fb.control<Country | null>(null, {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     postalCode: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     state: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     telephone: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     emailAddress: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [
-                //             Validators.required,
-                //             Validators.pattern(
-                //                 "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$"
-                //             )
-                //         ]
-                //     })
-                // }),
+                // additionalContactInformation: this.contactInformationFormGroup,
                 dateOfBirth: fb.control<DateTime>(
                     DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
                     { nonNullable: true, validators: [] }
@@ -790,112 +652,46 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
                 })
         });
 
-        this.userDetailsFormGroup = fb.group<FormGroupType<IUserDetails>>({
-            patientInformation: this.patientInformationFormGroup,
-
-            nonPatientInformation: this.nonPatientInformationFormGroup
+        this.hcpFormGroup = fb.group<FormGroupType<IHCPDetails>>({
+            name: this.nameInformationFormGroup,
+            contactInformation: this.contactInformationFormGroup
         });
 
-        this.userDetailsFormGroupBackup = JSON.parse(
-            JSON.stringify(this.userDetailsFormGroup.value)
-        );
+        // this.userDetailsFormGroup = fb.group<FormGroupType<IUserDetails>>({
+        //     patientInformation: this.patientInformationFormGroup,
+
+        //     nonPatientInformation: this.nonPatientInformationFormGroup
+        // });
+
+        this.problemDetailsQuestionsFormGroup = fb.record({});
+
+        this.problemDetailsFormGroup = fb.group<
+            FormGroupType<IProblemDetailsWithDone>
+        >({
+            done: fb.control<boolean>(false, {
+                nonNullable: true,
+                validators: [Validators.requiredTrue]
+            }),
+            questions: this.problemDetailsQuestionsFormGroup as any,
+            followUpOkay: fb.control<boolean>(false, { nonNullable: true })
+        });
 
         this.complaintDetailsFormGroup = fb.group<
             FormGroupType<IComplaintDetails>
         >({
-            product: fb.group<FormGroupType<IProductDetails>>({
-                tookProductAsDirected: fb.control<string>("", {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-                administeredBy: fb.control<AdministeredBy | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-                concomitantMedication: fb.group<
-                    FormGroupType<ConcomitantMedication>
-                >({
-                    status: fb.control<ConcomitantMedicationStatus | null>(
-                        null,
-                        {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }
-                    ),
-                    details: fb.group<
-                        FormGroupType<ConcomitantMedicationDetails>
-                    >({
-                        productName: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        formulation: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        indication: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        routeOfAdministration:
-                            this.fb.control<RouteOfAdministration | null>(
-                                null,
-                                {
-                                    nonNullable: true,
-                                    validators: [Validators.required]
-                                }
-                            ),
-                        startDate: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        endDate: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        dose: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        strength: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        frequency: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        frequencyTime: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        }),
-                        optionalImage: this.fb.control<string>("", {
-                            nonNullable: true,
-                            validators: [Validators.required]
-                        })
-                    })
-                })
-            }),
-            reportedFromJNJProgram: fb.control<string>("", {
+            selectedComplaint: fb.control<string>("", {
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            studyProgram: fb.control<string>("", {
+            issueDescription: fb.control<string>("", {
                 nonNullable: true,
                 validators: [Validators.required]
             }),
-            siteNumber: fb.control<number | null>(null, {
+            uploadImage: fb.control<File[]>([], {
                 nonNullable: true,
-                validators: [Validators.required]
+                validators: []
             }),
-            subjectNumber: fb.control<number | null>(null, {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            complaintDescription: fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            })
+            question: this.problemDetailsFormGroup
         });
 
         const stateControl = fb.control<string>("", {
@@ -965,26 +761,21 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
             }
         );
 
-        this.problemDetailsQuestionsFormGroup = fb.record({});
-        this.problemDetailsFormGroup = fb.group<
-            FormGroupType<IProblemDetailsWithDone>
-        >({
-            done: fb.control<boolean>(false, {
-                nonNullable: true,
-                validators: [Validators.requiredTrue]
-            }),
-            questions: this.problemDetailsQuestionsFormGroup as any,
-            followUpOkay: fb.control<boolean>(false, { nonNullable: true })
-        });
+        // this.complaintDetailsFormGroup.statusChanges
+        //     .pipe(takeUntil(this.destroy$))
+        //     .subscribe((status) => {
+        //         console.log(status);
+        //         this.getNextQuestions();
+        //     });
 
-        this.problemDetailsQuestionsFormGroup.statusChanges
-            .pipe(
-                filter((c) => c === "VALID"),
-                takeUntil(this.destroy$)
-            )
-            .subscribe((status) => {
-                this.getNextQuestions();
-            });
+        // this.problemDetailsQuestionsFormGroup.statusChanges
+        //     .pipe(
+        //         filter((c) => c === "VALID"),
+        //         takeUntil(this.destroy$)
+        //     )
+        //     .subscribe((status) => {
+        //         this.getNextQuestions();
+        //     });
 
         activedRoute.queryParamMap
             .pipe(
@@ -1040,12 +831,17 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
 
         this.readyForMoreQuestions$
             .pipe(
-                map((): IQuestionsRequest => {
-                    const product = this.productFormGroup.value;
-                    const reportForm = this.initialReportingFormGroup.value;
-                    const personalInformation =
-                        this.personalInformationFormGroup.value;
-                    const problemSummary = this.problemSummaryFormGroup.value;
+                map((): IIQuestionsRequest | null => {
+                    const complaintReport =
+                        this.complaintReportingFormGroup.value;
+
+                    if (!complaintReport) {
+                        return null;
+                    }
+
+                    const complaintDetails =
+                        this.complaintDetailsFormGroup.value;
+
                     const problemDetails =
                         this.problemDetailsQuestionsFormGroup.value;
 
@@ -1059,39 +855,70 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
                     }
 
                     return {
-                        product: {
-                            productQualityComplaint:
-                                product.productQualityComplaint ?? null,
-                            userType: product.userType!,
-                            brand: product.brand!,
-                            lotNumber: product.lotNumber ?? null
-                        },
-                        report: {
-                            userType: reportForm.userType!,
-                            permission: reportForm.permission!,
-                            contactInformartion: {
-                                name: reportForm.contactInformartion?.name!,
-                                facilityName:
-                                    reportForm.contactInformartion
-                                        ?.facilityName!,
-                                phoneNumber:
-                                    reportForm.contactInformartion
-                                        ?.phoneNumber!,
-                                email: reportForm.contactInformartion?.email!,
-                                address:
-                                    reportForm.contactInformartion?.address!
+                        complaintReport: {
+                            userType: complaintReport.userType ?? null,
+                            purchasedCountry:
+                                complaintReport.purchasedCountry ?? null,
+                            brandAndForm: {
+                                brandId: complaintReport.brandAndForm!.brandId!,
+                                formId: complaintReport.brandAndForm!.formId!
                             },
-                            product: reportForm.product! ?? null
+                            strengthId: complaintReport.strengthId ?? null,
+                            returnOption: complaintReport.returnOption ?? null,
+                            hasBatchOrLotNumber:
+                                complaintReport.hasBatchOrLotNumber ?? null,
+                            batchOrLotNumber: complaintReport.batchOrLotNumber!,
+                            batchOrLotNumberUnavailableReason:
+                                complaintReport.batchOrLotNumberUnavailableReason!,
+                            gtin: complaintReport.gtin!,
+                            serial: complaintReport.serial!,
+                            hcp: {
+                                reportedFromJNJProgram:
+                                    complaintReport.hcp
+                                        ?.reportedFromJNJProgram ?? null,
+                                studyProgram:
+                                    complaintReport.hcp?.studyProgram!,
+                                siteNumber:
+                                    complaintReport.hcp?.siteNumber ?? null,
+                                subjectNumber:
+                                    complaintReport.hcp?.subjectNumber ?? null
+                            }
                         },
-                        userType: reportForm.userType!,
-                        verbatim: problemSummary.issueVerbatim!,
+                        complaintData: {
+                            selectedComplaint:
+                                complaintDetails.selectedComplaint!,
+                            issueDescription:
+                                complaintDetails.issueDescription!,
+                            uploadImage: complaintDetails.uploadImage!,
+                            question: {
+                                done: complaintDetails.question?.done!,
+                                questions:
+                                    complaintDetails.question?.questions!,
+                                followUpOkay:
+                                    complaintDetails.question?.followUpOkay!
+                            }
+                        },
+                        userType: complaintReport.userType!,
+                        verbatim: complaintDetails.issueDescription!,
                         answeredQuestions
                     };
                 }),
+                filterTruthy(),
                 switchMap((c) => this.questionsService.getNextQuestions(c)),
                 takeUntil(this.destroy$)
             )
             .subscribe((resp) => {
+                // const complaintDetailsFormGroup =
+                //     this.complaintDetailsFormGroup;
+                // if (!complaintDetailsFormGroup.get("question")) {
+                //     complaintDetailsFormGroup.addControl("question", this.problemDetailsFormGroup);
+                // }
+
+                // console.log(
+                //     this.complaintDetailsFormGroup.value,
+                //     this.problemDetailsFormGroup
+                // );
+
                 if (resp.done) {
                     this.problemDetailsFormGroup.controls.done.setValue(true);
                     return;
@@ -1115,8 +942,16 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
                     );
                     problemDetailsQuestions.push(question);
                 }
+                console.log(
+                    this.problemDetailsFormGroup,
+                    this.problemDetailsQuestionsFormGroup
+                );
 
                 this.problemDetailsQuestions = problemDetailsQuestions;
+                console.log(
+                    this.problemDetailsQuestions,
+                    "==== problemDetailsQuestions==="
+                );
             });
 
         if (environment.token) {
@@ -1127,82 +962,6 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
         } else {
             this.authorized$ = of(true);
         }
-
-        this.imageHotspotValues = [
-            {
-                id: "simponi_device_failure_location",
-                type: "image-map",
-                required: true,
-                questionText: "",
-                imageUrl:
-                    "https://www.simponihcp.com/sites/www.simponihcp.com/files/injection_experience_autoinjector_desktop_1.png",
-                areas: [
-                    {
-                        value: "Hidden Needle",
-
-                        x: 394,
-                        y: 283,
-                        radius: 22,
-
-                        nextQuestionId: "needle_damage_type"
-                    },
-                    {
-                        value: "Safety Sleeve",
-
-                        x: 440,
-                        y: 253,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Tamper-Evident Seal",
-
-                        x: 545,
-                        y: 317,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Large Viewing Window",
-
-                        x: 625,
-                        y: 250,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Activation Button",
-
-                        x: 750,
-                        y: 236,
-                        radius: 22,
-
-                        nextQuestionId: "button_stuck"
-                    },
-                    {
-                        value: "Easy-to-Grip Shape",
-
-                        x: 927,
-                        y: 300,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    },
-                    {
-                        value: "Expiration Date",
-
-                        x: 1055,
-                        y: 328,
-                        radius: 22,
-
-                        nextQuestionId: "who_administered"
-                    }
-                ]
-            }
-        ];
 
         this.products.forEach((product) => {
             this.filteredBrands =
@@ -1221,192 +980,235 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
         // const newProgressValue = ((selectedStep + 1) / totalSteps) * 100;
 
         // this.progressBarService.setProgressValue(newProgressValue);
-        const userDetailsFormGroup = this.userDetailsFormGroup as FormGroup;
+        // const userDetailsFormGroup = this.userDetailsFormGroup as FormGroup;
 
-        const patientInformation = this.patientInformationFormGroup;
-        const nonPatientInformation = this.nonPatientInformationFormGroup;
+        const patientInformationFormGroup = this.patientInformationFormGroup;
+        const nonPatientInformationFormGroup =
+            this.nonPatientInformationFormGroup;
         const userType =
             this.complaintReportingFormGroup.get("userType")?.value;
 
-        if (userType === UserTypes.Patient) {
-            if (!userDetailsFormGroup.get("patientInformation")) {
-                userDetailsFormGroup.addControl(
-                    "patientInformation",
-                    patientInformation
-                );
-            }
+        const returnOption =
+            this.complaintReportingFormGroup.value?.returnOption;
 
-            userDetailsFormGroup.removeControl("nonPatientInformation");
-        } else {
-            if (!userDetailsFormGroup.get("nonPatientInformation")) {
-                userDetailsFormGroup.addControl(
-                    "nonPatientInformation",
-                    nonPatientInformation
-                );
-            }
+        const permissionToContactHCP = this.userDetailsFormGroup.get(
+            "patientInformation.permissionToContactHCP"
+        );
 
-            userDetailsFormGroup.removeControl("patientInformation");
-        }
+        // const patientInformation = userDetailsFormGroup.get(
+        //     "patientInformation"
+        // ) as FormGroup;
+        // const nonPatientInformation = userDetailsFormGroup.get(
+        //     "nonPatientInformation"
+        // ) as FormGroup;
+
+        // const patientFormGroup = patientInformation.get("patient") as FormGroup;
+
+        const isProductAvailable = this.fb.control<boolean | null>(null, {
+            nonNullable: true,
+            validators: [Validators.required]
+        });
+
+        // if (userType === UserTypes.Patient) {
+        //     if (!userDetailsFormGroup.get("patientInformation")) {
+        //         userDetailsFormGroup.addControl(
+        //             "patientInformation",
+        //             patientInformationFormGroup
+        //         );
+        //     }
+
+        //     if (returnOption === "Yes") {
+        //         patientFormGroup.addControl(
+        //             "isProductAvailable",
+        //             isProductAvailable
+        //         );
+        //     } else {
+        //         if (patientFormGroup.get("isProductAvailable")) {
+        //             patientFormGroup.removeControl("isProductAvailable");
+        //         }
+        //     }
+
+        //     userDetailsFormGroup.removeControl("nonPatientInformation");
+        // } else {
+        //     const nonPatientFormGroup = nonPatientInformation.get(
+        //         "patient"
+        //     ) as FormGroup;
+        //     if (!userDetailsFormGroup.get("nonPatientInformation")) {
+        //         userDetailsFormGroup.addControl(
+        //             "nonPatientInformation",
+        //             nonPatientInformationFormGroup
+        //         );
+        //     }
+        //     if (returnOption === "Yes") {
+        //         nonPatientFormGroup.addControl(
+        //             "isProductAvailable",
+        //             isProductAvailable
+        //         );
+        //     } else {
+        //         if (nonPatientFormGroup.get("isProductAvailable")) {
+        //             nonPatientFormGroup.removeControl("isProductAvailable");
+        //         }
+        //     }
+        //     userDetailsFormGroup.removeControl("patientInformation");
+        // }
+
         this.userDetailsFormGroup.updateValueAndValidity();
+        // console.log(this.userDetailsFormGroup.value);
     }
 
-    loadPatientDetailsFormGroup() {
-        const patientInformation = this.fb.group<
-            FormGroupType<IPatientInformation>
-        >({
-            permissionToContact: this.fb.control<ContactPermission | null>(
-                null,
-                {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }
-            ),
-            patient: this.fb.group<FormGroupType<IPatientDetails>>({
-                name: this.nameInformationFormGroup,
-                contactInformation: this.contactInformationFormGroup,
-                isProductAvailable: this.fb.control<boolean | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-                additionalContactInformation: this.contactInformationFormGroup,
-                dateOfBirth: this.fb.control<DateTime>(
-                    DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
-                    { nonNullable: true, validators: [] }
-                ),
-                ageAtComplaint: this.fb.control<string | null>(null, {
-                    nonNullable: true,
-                    validators: []
-                })
-            }),
-            awareOfComplaint: this.fb.control<PhysicianAwareness | null>(null, {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            permissionToContactHCP:
-                this.fb.control<ContactPermissionHCP | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-            hcp: this.fb.group<FormGroupType<IHCPDetails>>({
-                name: this.nameInformationFormGroup,
-                contactInformation: this.contactInformationFormGroup
-            })
-        });
+    // loadPatientDetailsFormGroup() {
+    //     const patientInformation = this.fb.group<
+    //         FormGroupType<IPatientInformation>
+    //     >({
+    //         permissionToContact: this.fb.control<ContactPermission | null>(
+    //             null,
+    //             {
+    //                 nonNullable: true,
+    //                 validators: [Validators.required]
+    //             }
+    //         ),
+    //         patient: this.fb.group<FormGroupType<IPatientDetails>>({
+    //             name: this.nameInformationFormGroup,
+    //             contactInformation: this.contactInformationFormGroup,
+    //             isProductAvailable: this.fb.control<boolean | null>(null, {
+    //                 nonNullable: true,
+    //                 validators: [Validators.required]
+    //             }),
+    //             additionalContactInformation: this.contactInformationFormGroup,
+    //             dateOfBirth: this.fb.control<DateTime>(
+    //                 DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
+    //                 { nonNullable: true, validators: [] }
+    //             ),
+    //             ageAtComplaint: this.fb.control<string | null>(null, {
+    //                 nonNullable: true,
+    //                 validators: []
+    //             })
+    //         }),
+    //         awareOfComplaint: this.fb.control<PhysicianAwareness | null>(null, {
+    //             nonNullable: true,
+    //             validators: [Validators.required]
+    //         }),
+    //         permissionToContactHCP:
+    //             this.fb.control<ContactPermissionHCP | null>(null, {
+    //                 nonNullable: true,
+    //                 validators: [Validators.required]
+    //             }),
+    //         hcp: this.fb.group<FormGroupType<IHCPDetails>>({
+    //             name: this.nameInformationFormGroup,
+    //             contactInformation: this.contactInformationFormGroup
+    //         })
+    //     });
 
-        this.userDetailsFormGroup.addControl(
-            "patientInformation",
-            patientInformation
-        );
-    }
+    //     this.userDetailsFormGroup.addControl(
+    //         "patientInformation",
+    //         patientInformation
+    //     );
+    // }
 
-    loadNonPatientDetailsFormGroup() {
-        const nonPatientInformation = this.fb.group<
-            FormGroupType<INonPatientInformation>
-        >({
-            permissionToContactReporter:
-                this.fb.control<ContactPermissionReporter | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-            patient: this.fb.group<FormGroupType<IPatientDetails>>({
-                name: this.nameInformationFormGroup,
-                contactInformation: this.contactInformationFormGroup,
-                isProductAvailable: this.fb.control<boolean | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-                additionalContactInformation: this.contactInformationFormGroup,
-                // additionalContactInformation: fb.group<
-                //     FormGroupType<IContactInformation>
-                // >({
-                //     addressLine1: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     addressLine2: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: []
-                //     }),
-                //     city: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     country: fb.control<Country | null>(null, {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     postalCode: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     state: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     telephone: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [Validators.required]
-                //     }),
-                //     emailAddress: fb.control<string>("", {
-                //         nonNullable: true,
-                //         validators: [
-                //             Validators.required,
-                //             Validators.pattern(
-                //                 "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$"
-                //             )
-                //         ]
-                //     })
-                // }),
-                dateOfBirth: this.fb.control<DateTime>(
-                    DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
-                    { nonNullable: true, validators: [] }
-                ),
-                ageAtComplaint: this.fb.control<string | null>(null, {
-                    nonNullable: true,
-                    validators: []
-                })
-            }),
-            reporter: this.fb.group<FormGroupType<IReporterDetails>>({
-                name: this.nameInformationFormGroup,
-                contactInformation: this.contactInformationFormGroup
-            }),
-            facilityName: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            reporterAdministeredProduct:
-                this.fb.control<ReporterAdministration | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                })
-        });
+    // loadNonPatientDetailsFormGroup() {
+    //     const nonPatientInformation = this.fb.group<
+    //         FormGroupType<INonPatientInformation>
+    //     >({
+    //         permissionToContactReporter:
+    //             this.fb.control<ContactPermissionReporter | null>(null, {
+    //                 nonNullable: true,
+    //                 validators: [Validators.required]
+    //             }),
+    //         patient: this.fb.group<FormGroupType<IPatientDetails>>({
+    //             name: this.nameInformationFormGroup,
+    //             contactInformation: this.contactInformationFormGroup,
+    //             isProductAvailable: this.fb.control<boolean | null>(null, {
+    //                 nonNullable: true,
+    //                 validators: [Validators.required]
+    //             }),
+    //             additionalContactInformation: this.contactInformationFormGroup,
+    //             // additionalContactInformation: fb.group<
+    //             //     FormGroupType<IContactInformation>
+    //             // >({
+    //             //     addressLine1: fb.control<string>("", {
+    //             //         nonNullable: true,
+    //             //         validators: [Validators.required]
+    //             //     }),
+    //             //     addressLine2: fb.control<string>("", {
+    //             //         nonNullable: true,
+    //             //         validators: []
+    //             //     }),
+    //             //     city: fb.control<string>("", {
+    //             //         nonNullable: true,
+    //             //         validators: [Validators.required]
+    //             //     }),
+    //             //     country: fb.control<Country | null>(null, {
+    //             //         nonNullable: true,
+    //             //         validators: [Validators.required]
+    //             //     }),
+    //             //     postalCode: fb.control<string>("", {
+    //             //         nonNullable: true,
+    //             //         validators: [Validators.required]
+    //             //     }),
+    //             //     state: fb.control<string>("", {
+    //             //         nonNullable: true,
+    //             //         validators: [Validators.required]
+    //             //     }),
+    //             //     telephone: fb.control<string>("", {
+    //             //         nonNullable: true,
+    //             //         validators: [Validators.required]
+    //             //     }),
+    //             //     emailAddress: fb.control<string>("", {
+    //             //         nonNullable: true,
+    //             //         validators: [
+    //             //             Validators.required,
+    //             //             Validators.pattern(
+    //             //                 "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$"
+    //             //             )
+    //             //         ]
+    //             //     })
+    //             // }),
+    //             dateOfBirth: this.fb.control<DateTime>(
+    //                 DateTime.fromObject({ year: 1980, month: 1, day: 1 }),
+    //                 { nonNullable: true, validators: [] }
+    //             ),
+    //             ageAtComplaint: this.fb.control<string | null>(null, {
+    //                 nonNullable: true,
+    //                 validators: []
+    //             })
+    //         }),
+    //         reporter: this.fb.group<FormGroupType<IReporterDetails>>({
+    //             name: this.nameInformationFormGroup,
+    //             contactInformation: this.contactInformationFormGroup
+    //         }),
+    //         facilityName: this.fb.control<string>("", {
+    //             nonNullable: true,
+    //             validators: [Validators.required]
+    //         }),
+    //         reporterAdministeredProduct:
+    //             this.fb.control<ReporterAdministration | null>(null, {
+    //                 nonNullable: true,
+    //                 validators: [Validators.required]
+    //             })
+    //     });
 
-        this.userDetailsFormGroup.addControl(
-            "nonPatientInformation",
-            nonPatientInformation
-        );
-    }
+    //     this.userDetailsFormGroup.addControl(
+    //         "nonPatientInformation",
+    //         nonPatientInformation
+    //     );
+    // }
 
     ngAfterViewInit(): void {
-        this.complaintReportingFormGroup.controls.product.valueChanges
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((product) => {
-                if (product) {
-                    this.scrollToItemSection();
-                }
-            });
-
-        this.complaintReportingFormGroup.controls.brand.valueChanges
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((brand) => {
-                if (brand) {
-                    this.scrollToStrengthSection();
-                }
+        observeFormControlValue<IComplaintReporting | null>(
+            this.complaintReportingFormGroup
+        )
+            .pipe(
+                map((c) => c?.userType ?? null),
+                distinctUntilChanged(),
+                takeUntil(this.destroy$)
+            )
+            .subscribe(() => {
+                this.scrollToStrengthSection();
             });
     }
 
-    ngOnInit(): void {
-        this.complaintReportingFormGroup.controls.userType.valueChanges
+    ngOnInit() {
+        this.complaintReportingFormGroup.valueChanges
             .pipe(takeUntil(this.destroy$))
             .subscribe((user) => {
                 if (user) {
@@ -1427,89 +1229,31 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
             });
     }
 
-    addConcomitantProductDetails() {
-        const cc = {
-            productName: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            formulation: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            indication: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            routeOfAdministration:
-                this.fb.control<RouteOfAdministration | null>(null, {
-                    nonNullable: true,
-                    validators: [Validators.required]
-                }),
-            startDate: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            endDate: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            dose: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            strength: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            frequency: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            frequencyTime: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            }),
-            optionalImage: this.fb.control<string>("", {
-                nonNullable: true,
-                validators: [Validators.required]
-            })
-        };
-        // this.complaintDetailsFormGroup.
-    }
-
-    addConcomitantProduct() {
-        this.showConcomitantProductDetails = true;
-    }
-
-    deleteConcomitantProduct() {
-        this.showConcomitantProductDetails = false;
-    }
-
-    onTabsChange() {
-        this.complaintReportingFormGroup.controls.product.setValue("");
-    }
-
     // get concomitantProductDetails(): FormArray {
     //   return this.complaintDetailsFormGroup.get('product.concomitantMedication.details') as FormArray;
     // }
 
-    get formControls(): { label: string; value: string }[] {
-        const controls = this.complaintReportingFormGroup.controls;
-        const entries = Object.keys(controls).map((key) => {
-            const control: AbstractControl =
-                this.complaintReportingFormGroup.get(key) as AbstractControl;
+    get step1FormControls(): { label: string; value: string }[] {
+        const complaintReporting = this.complaintReportingFormGroup.value;
+
+        if (!complaintReporting) {
+            return [];
+        }
+
+        const entries = Object.keys(complaintReporting).map((key) => {
             let value: string;
 
-            if (Array.isArray(control.value)) {
-                value = control.value.join(", ");
+            const controlValue = (complaintReporting as any)[key] as unknown;
+
+            if (Array.isArray(controlValue)) {
+                value = controlValue.join(", ");
             } else if (
-                typeof control.value === "object" &&
-                control.value !== null
+                typeof controlValue === "object" &&
+                controlValue !== null
             ) {
-                value = this.formatObjectValue(control.value);
-            } else if (control.value !== null) {
-                value = control.value.toString();
+                value = this.formatObjectValue(controlValue);
+            } else if (!!controlValue) {
+                value = controlValue.toString();
             } else {
                 return null;
             }
@@ -1523,6 +1267,37 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
             value: string;
         }[];
     }
+
+    // get step2FormControls(): { label: string; value: string }[] {
+    //     const controls = this.userDetailsFormGroup.controls;
+    //     const entries = Object.keys(controls).map((key) => {
+    //         const control: AbstractControl = this.userDetailsFormGroup.get(
+    //             key
+    //         ) as AbstractControl;
+    //         let value: string;
+
+    //         if (Array.isArray(control.value)) {
+    //             value = control.value.join(", ");
+    //         } else if (
+    //             typeof control.value === "object" &&
+    //             control.value !== null
+    //         ) {
+    //             value = this.formatObjectValue(control.value);
+    //         } else if (control.value !== null) {
+    //             value = control.value.toString();
+    //         } else {
+    //             return null;
+    //         }
+    //         return {
+    //             label: key,
+    //             value: value
+    //         };
+    //     });
+    //     return entries.filter((entry) => entry !== null) as {
+    //         label: string;
+    //         value: string;
+    //     }[];
+    // }
 
     get productQualityComplaint() {
         return this.productFormGroup.controls.productQualityComplaint.value;
@@ -1542,6 +1317,10 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
         //   this.showMedicalHistory = false;
         // }
         // this.stepper.next();
+    }
+
+    loadQuestions() {
+        return this.getNextQuestions();
     }
 
     resetProblemDetails() {
@@ -1585,10 +1364,6 @@ export class StepperComponent implements OnDestroy, OnInit, AfterViewInit {
         }
 
         return true;
-    }
-
-    private scrollToItemSection(): void {
-        // this.brandsSection.nativeElement.scrollIntoView({ behavior: 'smooth' });
     }
 
     private scrollToStrengthSection(): void {

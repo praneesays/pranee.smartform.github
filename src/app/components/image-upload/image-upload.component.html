@@ -1,6 +1,6 @@
 <div>
     <input #csvInput multiple hidden="true" type="file" onclick="this.value=null" (change)="onFile($any($event.target).files)" accept="image/*" />
-    <button mat-flat-button color="primary" (click)="openFilePicker(csvInput)">{{ text }}</button>
+    <button mat-flat-button color="primary" class="primary-btn" (click)="openFilePicker(csvInput)">{{ text }}</button>
 </div>
 
 <div *ngIf="images.length > 0" style="display: flex">

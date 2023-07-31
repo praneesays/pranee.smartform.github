@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+// import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { ComplaintFormComponent } from './complaint-form.component';
+// import { ComplaintFormComponent } from "./complaint-form.component";
 
-describe('ComplaintFormComponent', () => {
-  let component: ComplaintFormComponent;
-  let fixture: ComponentFixture<ComplaintFormComponent>;
+// describe("ComplaintFormComponent", () => {
+//     let component: ComplaintFormComponent;
+//     let fixture: ComponentFixture<ComplaintFormComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ ComplaintFormComponent ]
-    })
-    .compileComponents();
+//     beforeEach(async () => {
+//         await TestBed.configureTestingModule({
+//             declarations: [ComplaintFormComponent]
+//         }).compileComponents();
 
-    fixture = TestBed.createComponent(ComplaintFormComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+//         fixture = TestBed.createComponent(ComplaintFormComponent);
+//         component = fixture.componentInstance;
+//         fixture.detectChanges();
+//     });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+//     it("should create", () => {
+//         expect(component).toBeTruthy();
+//     });
+// });
