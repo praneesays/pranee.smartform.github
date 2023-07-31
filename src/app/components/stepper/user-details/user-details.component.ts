@@ -1,9 +1,10 @@
-import { Component, Input, OnInit, OnDestroy } from "@angular/core";
+import { Component, Input, OnInit, OnDestroy, forwardRef } from "@angular/core";
 import {
     AbstractControl,
     ControlValueAccessor,
     FormControl,
     FormGroup,
+    NG_VALUE_ACCESSOR,
     Validators
 } from "@angular/forms";
 import { DateTime } from "luxon";
@@ -15,6 +16,7 @@ import {
     Country,
     IComplaintReporting,
     IHCPDetails,
+    IPersonName,
     IUserDetails,
     PhysicianAwareness,
     Product,
@@ -28,7 +30,14 @@ import { FormGroupType } from "../stepper.component";
 @Component({
     selector: "app-user-details",
     templateUrl: "./user-details.component.html",
-    styleUrls: ["./user-details.component.scss"]
+    styleUrls: ["./user-details.component.scss"],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            multi: true,
+            useExisting: forwardRef(() => UserDetailsComponent)
+        }
+    ]
 })
 // export class UserDetailsComponent implements OnInit, OnDestroy {
 //     readonly UserTypes = UserTypes;
@@ -204,17 +213,24 @@ export class UserDetailsComponent
 
     countriesList?: Observable<string[]>;
 
-    readonly nameInformationFormGroup = new FormGroup({
-        title: new FormControl<Title | null>(null, {
-            validators: []
-        }),
-        firstName: new FormControl<string>("", {
+    readonly nameInformationFormGroup = new FormControl<IPersonName | null>(
+        null,
+        {
             validators: [Validators.required]
-        }),
-        lastName: new FormControl<string>("", {
-            validators: [Validators.required]
-        })
-    });
+        }
+    );
+
+    // readonly nameInformationFormGroup = new FormGroup({
+    //     title: new FormControl<Title | null>(null, {
+    //         validators: []
+    //     }),
+    //     firstName: new FormControl<string>("", {
+    //         validators: [Validators.required]
+    //     }),
+    //     lastName: new FormControl<string>("", {
+    //         validators: [Validators.required]
+    //     })
+    // });
 
     readonly contactInformationFormGroup = new FormGroup({
         addressLine1: new FormControl<string>("", {
@@ -486,11 +502,17 @@ export class UserDetailsComponent
                 takeUntil(this.destroy$)
             )
             .subscribe((c) => {
-                // const onChange = this.onChange;
-                // if (!onChange) {
-                //     return;
-                // }
-                // onChange(c);
+                const onChange = this.onChange;
+                if (!onChange) {
+                    return;
+                }
+                onChange(c);
+            });
+
+        this.formGroup.valueChanges
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((status) => {
+                console.log(status);
             });
     }
 

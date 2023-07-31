@@ -32,7 +32,7 @@
                     </div>
 
                     <div formGroupName="patient">
-                        <app-person-name controlName="patientInformation.patient.name"></app-person-name>
+                        <app-person-name [formControl]="nameInformationFormGroup"></app-person-name>
 
                         <app-contact-information controlName="patientInformation.patient.contactInformation"></app-contact-information>
 

@@ -1,13 +1,15 @@
-import { Component, Input, OnDestroy, OnInit, forwardRef } from "@angular/core";
+import { Component, OnDestroy, OnInit, forwardRef } from "@angular/core";
 import {
+    AbstractControl,
     ControlValueAccessor,
     FormControl,
     FormGroup,
-    FormGroupDirective,
-    NG_VALUE_ACCESSOR
+    NG_VALUE_ACCESSOR,
+    Validators
 } from "@angular/forms";
-import { Subject, takeUntil } from "rxjs";
-import { Title } from "src/app/types";
+import { Subject, map, takeUntil } from "rxjs";
+import { IPersonName, Title } from "src/app/types";
+import { observeFormControlValue } from "src/app/utilities/rxjs-utils";
 
 @Component({
     selector: "app-person-name",
@@ -26,30 +28,54 @@ export class PersonNameComponent
 {
     readonly titleOptions: string[] = Object.values(Title);
 
-    form!: FormGroup;
-    @Input() controlName!: string;
-    nameControl: FormControl = new FormControl();
+    readonly formGroup = new FormGroup({
+        title: new FormControl<Title | null>(null, {
+            validators: []
+        }),
+        firstName: new FormControl<string>("", {
+            validators: [Validators.required]
+        }),
+        lastName: new FormControl<string>("", {
+            validators: [Validators.required]
+        })
+    });
+
     private readonly destroy$ = new Subject<void>();
 
-    constructor(private rootFormGroup: FormGroupDirective) {}
+    private onTouched?: () => void;
+    private onChange?: (val: IPersonName | null) => void;
 
-    onTouched = () => {};
-    onChange: any = () => {};
+    constructor() {
+        observeFormControlValue(this.formGroup)
+            .pipe(
+                map((c): IPersonName | null => {
+                    if (!c) {
+                        return null;
+                    }
 
-    ngOnInit(): void {
-        this.form = this.rootFormGroup.control.get(
-            this.controlName
-        ) as FormGroup;
-        // this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-        //     console.log(this.form.value);
-        //     this.onChange(this.form.value);
-        // });
-        // this.nameControl.valueChanges
-        //     .pipe(takeUntil(this.destroy$))
-        //     .subscribe((value) => {
-        //         console.log(value);
-        //         this.onChange(value);
-        //     });
+                    return {
+                        title: c.title ?? null,
+                        firstName: c.firstName!,
+                        lastName: c.lastName!
+                    };
+                }),
+                takeUntil(this.destroy$)
+            )
+            .subscribe((c) => {
+                const onChange = this.onChange;
+                if (!onChange) {
+                    return;
+                }
+                onChange(c);
+            });
+    }
+
+    ngOnInit() {
+        this.formGroup.valueChanges
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((value) => {
+                // console.log(value);
+            });
     }
 
     ngOnDestroy() {
@@ -57,28 +83,37 @@ export class PersonNameComponent
         this.destroy$.complete();
     }
 
-    writeValue(value: any) {
-        if (value) {
-            this.nameControl.setValue(value);
-        }
+    setRequiredValidator(control: AbstractControl) {
+        control?.setValidators(Validators.required);
     }
 
-    registerOnTouched(onTouched: any) {
-        this.onTouched = onTouched;
+    clearValidatorsAndSetValue(control: AbstractControl) {
+        control?.setValue("");
+        control?.clearValidators();
     }
 
-    registerOnChange(onChange: any) {
-        this.onChange = onChange;
-        // this.form.valueChanges
-        //     .pipe(takeUntil(this.destroy$))
-        //     .subscribe(onChange);
+    updateFormControlValidity(control: AbstractControl) {
+        control?.updateValueAndValidity();
     }
 
-    setDisabledState?(isDisabled: boolean) {
+    writeValue(obj: IPersonName | null): void {
+        this.formGroup.setValue({
+            title: obj?.title ?? null,
+            firstName: obj?.firstName!,
+            lastName: obj?.lastName!
+        });
+    }
+    registerOnChange(fn: (val: IPersonName | null) => void): void {
+        this.onChange = fn;
+    }
+    registerOnTouched(fn: () => void): void {
+        this.onTouched = fn;
+    }
+    setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
-            this.form.disable();
+            this.formGroup.disable();
         } else {
-            this.form.enable();
+            this.formGroup.enable();
         }
     }
 }

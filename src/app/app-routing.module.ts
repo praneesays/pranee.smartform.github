@@ -40,6 +40,11 @@ if (window.location.pathname !== "/") {
         {
             path: "home",
             component: StepperComponent
+        },
+        {
+            path: "contact-us",
+            component: ContactUsComponent,
+            data: { skipRouteLocalization: true }
         }
         // {
         //     path: "**",
